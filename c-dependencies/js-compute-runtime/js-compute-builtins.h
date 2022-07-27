@@ -53,6 +53,9 @@ inline bool ThrowIfNotConstructing(JSContext *cx, const JS::CallArgs &args, cons
   JS_ReportErrorNumberASCII(cx, GetErrorMessage, nullptr, JSMSG_BUILTIN_CTOR_NO_NEW, builtinName);
   return false;
 }
+
+uint8_t *value_to_buffer(JSContext *cx, JS::HandleValue val, const char *val_desc, size_t *len);
+
 bool hasWizeningFinished();
 bool isWizening();
 void markWizeningAsFinished();
