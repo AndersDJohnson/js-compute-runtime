@@ -99,9 +99,9 @@ enum { ObjectStore, Count };
 bool is_instance(JSObject *obj);
 bool is_instance(JS::Value val);
 
-ObjectStoreHandle object_store_handle(JSObject *obj) {
+fastly_object_store_handle_t object_store_handle(JSObject *obj) {
   JS::Value val = JS::GetReservedSlot(obj, Slots::ObjectStore);
-  return ObjectStoreHandle{static_cast<uint32_t>(val.toInt32())};
+  return fastly_object_store_handle_t{static_cast<uint32_t>(val.toInt32())};
 }
 
 const unsigned ctor_length = 1;
@@ -399,7 +399,7 @@ bool constructor(JSContext *cx, unsigned argc, JS::Value *vp) {
     }
   }
 
-  ObjectStoreHandle object_store_handle = {INVALID_HANDLE};
+  fastly_object_store_handle_t object_store_handle = {INVALID_HANDLE};
   auto status = convert_to_fastly_status(
       xqd_object_store_open(name_chars, name_len, &object_store_handle));
   if (status == FastlyStatus::Inval) {
@@ -417,7 +417,7 @@ bool constructor(JSContext *cx, unsigned argc, JS::Value *vp) {
     return false;
   }
   JS::SetReservedSlot(object_store, Slots::ObjectStore,
-                      JS::Int32Value((int)object_store_handle.handle));
+                      JS::Int32Value(object_store_handle));
   args.rval().setObject(*object_store);
   return true;
 }
