@@ -26,7 +26,7 @@ FSM_SRC := $(ROOT_SRC)/js-compute-runtime/
 WASI_CXX ?= /opt/wasi-sdk/bin/clang++
 
 
-CXX_FLAGS := -std=gnu++17 -Wall -Werror -Qunused-arguments -fno-sized-deallocation -fno-aligned-new -mthread-model single -fPIC -fno-rtti -fno-exceptions -fno-math-errno -pipe -fno-omit-frame-pointer -funwind-tables -I$(FSM_SRC)
+CXX_FLAGS := -std=gnu++20 -Wall -Werror -Qunused-arguments -fno-sized-deallocation -fno-aligned-new -mthread-model single -fPIC -fno-rtti -fno-exceptions -fno-math-errno -pipe -fno-omit-frame-pointer -funwind-tables -I$(FSM_SRC)
 DEFINES ?=
 LD_FLAGS := -Wl,-z,noexecstack -Wl,-z,text -Wl,-z,relro -Wl,-z,nocopyreloc -Wl,-z,stack-size=1048576 -Wl,--stack-first
 
