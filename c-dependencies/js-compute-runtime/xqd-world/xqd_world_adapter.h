@@ -36,9 +36,9 @@ fastly_error_t xqd_fastly_http_req_downstream_tls_client_certificate(fastly_list
 fastly_error_t xqd_fastly_http_req_downstream_tls_client_cert_verify_result(void);
 fastly_error_t xqd_fastly_http_req_downstream_tls_ja3_md5(fastly_list_u8_t *ret);
 fastly_error_t xqd_fastly_http_req_new(fastly_request_handle_t *ret);
-fastly_error_t xqd_fastly_http_req_header_names_get(fastly_request_handle_t h, fastly_cursor_t cursor, fastly_tuple2_string_option_cursor_t *ret);
-fastly_error_t xqd_fastly_http_req_header_value_get(fastly_request_handle_t h, xqd_world_string_t *name, xqd_world_string_t *ret);
-fastly_error_t xqd_fastly_http_req_header_values_get(fastly_request_handle_t h, xqd_world_string_t *name, fastly_cursor_t cursor, fastly_tuple2_string_option_cursor_t *ret);
+fastly_error_t xqd_fastly_http_req_header_names_get(fastly_request_handle_t h, fastly_list_string_t *ret);
+fastly_error_t xqd_fastly_http_req_header_value_get(fastly_request_handle_t h, xqd_world_string_t *name, fastly_option_string_t *ret);
+fastly_error_t xqd_fastly_http_req_header_values_get(fastly_request_handle_t h, xqd_world_string_t *name, fastly_option_list_string_t *ret);
 fastly_error_t xqd_fastly_http_req_header_values_set(fastly_request_handle_t h, xqd_world_string_t *name, fastly_list_string_t *values);
 fastly_error_t xqd_fastly_http_req_header_insert(fastly_request_handle_t h, xqd_world_string_t *name, xqd_world_string_t *value);
 fastly_error_t xqd_fastly_http_req_header_append(fastly_request_handle_t h, xqd_world_string_t *name, xqd_world_string_t *value);
@@ -64,9 +64,9 @@ fastly_error_t xqd_fastly_http_req_redirect_to_grip_proxy(xqd_world_string_t *ba
 fastly_error_t xqd_fastly_http_req_framing_headers_mode_set(fastly_request_handle_t h, fastly_framing_headers_mode_t mode);
 fastly_error_t xqd_fastly_http_req_register_dynamic_backend(xqd_world_string_t *prefix, xqd_world_string_t *target, fastly_dynamic_backend_config_t *config);
 fastly_error_t xqd_fastly_http_resp_new(fastly_response_handle_t *ret);
-fastly_error_t xqd_fastly_http_resp_header_names_get(fastly_response_handle_t h, fastly_cursor_t cursor, fastly_tuple2_string_option_cursor_t *ret);
-fastly_error_t xqd_fastly_http_resp_header_value_get(fastly_response_handle_t h, xqd_world_string_t *name, xqd_world_string_t *ret);
-fastly_error_t xqd_fastly_http_resp_header_values_get(fastly_response_handle_t h, xqd_world_string_t *name, fastly_cursor_t cursor, fastly_tuple2_string_option_cursor_t *ret);
+fastly_error_t xqd_fastly_http_resp_header_names_get(fastly_response_handle_t h, fastly_list_string_t *ret);
+fastly_error_t xqd_fastly_http_resp_header_value_get(fastly_response_handle_t h, xqd_world_string_t *name, fastly_option_string_t *ret);
+fastly_error_t xqd_fastly_http_resp_header_values_get(fastly_response_handle_t h, xqd_world_string_t *name, fastly_option_list_string_t *ret);
 fastly_error_t xqd_fastly_http_resp_header_values_set(fastly_response_handle_t h, xqd_world_string_t *name, fastly_list_string_t *values);
 fastly_error_t xqd_fastly_http_resp_header_insert(fastly_response_handle_t h, xqd_world_string_t *name, xqd_world_string_t *value);
 fastly_error_t xqd_fastly_http_resp_header_append(fastly_response_handle_t h, xqd_world_string_t *name, xqd_world_string_t *value);

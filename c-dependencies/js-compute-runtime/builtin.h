@@ -10,27 +10,6 @@
   printf(__VA_ARGS__);                                                                             \
   fflush(stdout);
 
-#define MULTI_VALUE_HOSTCALL(op, accum)                                                            \
-  uint32_t cursor = 0;                                                                             \
-  int64_t ending_cursor = 0;                                                                       \
-  size_t nwritten;                                                                                 \
-                                                                                                   \
-  while (true) {                                                                                   \
-    op                                                                                             \
-                                                                                                   \
-        if (nwritten == 0) {                                                                       \
-      break;                                                                                       \
-    }                                                                                              \
-                                                                                                   \
-    accum                                                                                          \
-                                                                                                   \
-        if (ending_cursor < 0) {                                                                   \
-      break;                                                                                       \
-    }                                                                                              \
-                                                                                                   \
-    cursor = (uint32_t)ending_cursor;                                                              \
-  }
-
 #define CLASS_BOILERPLATE_CUSTOM_INIT(cls)                                                         \
   constexpr const JSClassOps class_ops = {};                                                       \
   const uint32_t class_flags = 0;                                                                  \

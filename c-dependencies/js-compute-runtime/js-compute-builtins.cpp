@@ -3008,44 +3008,27 @@ bool append_header_value_to_map(JSContext *cx, HandleObject self, HandleValue no
 
 bool get_header_names_from_handle(JSContext *cx, uint32_t handle, Mode mode,
                                   HandleObject backing_map) {
+  FastlyStatus result;
+  fastly_list_string_t ret;
+  if (mode == Mode::ProxyToRequest) {
+    result = convert_to_fastly_status(xqd_fastly_http_req_header_names_get(handle, &ret));
+  } else {
+    result = convert_to_fastly_status(xqd_fastly_http_resp_header_names_get(handle, &ret));
+  }
+
+  if (!HANDLE_RESULT(cx, result))
+    return false;
+
   RootedString name(cx);
   RootedValue name_val(cx);
-  OwnedHostCallBuffer buffer;
+  for (size_t i = 0; i < ret.len; i++) {
+    name = JS_NewStringCopyN(cx, ret.ptr[i].ptr, ret.ptr[i].len);
+    if (!name)
+      return false;
 
-  MULTI_VALUE_HOSTCALL(
-      {
-        FastlyStatus result;
-        if (mode == Mode::ProxyToRequest) {
-          fastly_request_handle_t request = {handle};
-          result = convert_to_fastly_status(xqd_req_header_names_get(
-              request, buffer.get(), HEADER_MAX_LEN, cursor, &ending_cursor, &nwritten));
-        } else {
-          fastly_response_handle_t response = {handle};
-          result = convert_to_fastly_status(xqd_resp_header_names_get(
-              response, buffer.get(), HEADER_MAX_LEN, cursor, &ending_cursor, &nwritten));
-        }
-
-        if (!HANDLE_RESULT(cx, result))
-          return false;
-      },
-      {
-        uint32_t offset = 0;
-        for (size_t i = 0; i < nwritten; i++) {
-          if (buffer.get()[i] != '\0') {
-            continue;
-          }
-
-          name = JS_NewStringCopyN(cx, buffer.get() + offset, i - offset);
-          if (!name)
-            return false;
-
-          name_val.setString(name);
-          JS::MapSet(cx, backing_map, name_val, JS::NullHandleValue);
-
-          offset = i + 1;
-        }
-      })
-
+    name_val.setString(name);
+    JS::MapSet(cx, backing_map, name_val, JS::NullHandleValue);
+  }
   return true;
 }
 
@@ -3055,49 +3038,33 @@ static bool retrieve_value_for_header_from_handle(JSContext *cx, HandleObject se
   MOZ_ASSERT(mode != Mode::Standalone);
   uint32_t handle = detail::handle(self);
 
-  size_t name_len;
+  xqd_world_string_t str;
   RootedString name_str(cx, name.toString());
-  UniqueChars name_chars = encode(cx, name_str, &name_len);
+  UniqueChars name_chars = encode(cx, name_str, &str.len);
+  str.ptr = name_chars.get();
+
+  fastly_option_list_string_t ret;
+
+  FastlyStatus result;
+  if (mode == Headers::Mode::ProxyToRequest) {
+    result = convert_to_fastly_status(xqd_fastly_http_req_header_values_get(handle, &str, &ret));
+  } else {
+    result = convert_to_fastly_status(xqd_fastly_http_resp_header_values_get(handle, &str, &ret));
+  }
+
+  if (!ret.is_some)
+    return true;
 
   RootedString val_str(cx);
-  OwnedHostCallBuffer buffer;
-
-  MULTI_VALUE_HOSTCALL(
-      {
-        FastlyStatus result;
-        if (mode == Headers::Mode::ProxyToRequest) {
-          fastly_request_handle_t request = {handle};
-          result = convert_to_fastly_status(
-              xqd_req_header_values_get(request, name_chars.get(), name_len, buffer.get(),
-                                        HEADER_MAX_LEN, cursor, &ending_cursor, &nwritten));
-        } else {
-          fastly_response_handle_t response = {handle};
-          result = convert_to_fastly_status(
-              xqd_resp_header_values_get(response, name_chars.get(), name_len, buffer.get(),
-                                         HEADER_MAX_LEN, cursor, &ending_cursor, &nwritten));
-        }
-
-        if (!HANDLE_RESULT(cx, result))
-          return false;
-      },
-      {
-        size_t offset = 0;
-        for (size_t i = 0; i < nwritten; i++) {
-          if (buffer.get()[i] == '\0') {
-            val_str = JS_NewStringCopyUTF8N(cx, JS::UTF8Chars(buffer.get() + offset, i - offset));
-            if (!val_str)
-              return false;
-
-            value.setString(val_str);
-
-            if (!append_header_value_to_map(cx, self, name, value))
-              return false;
-
-            offset = i + 1;
-          }
-        }
-      })
-
+  for (size_t i = 0; i < ret.val.len; i++) {
+    val_str = JS_NewStringCopyUTF8N(cx, JS::UTF8Chars(ret.val.ptr[i].ptr, ret.val.ptr[i].len));
+    if (!val_str)
+      return false;
+    value.setString(val_str);
+    if (!append_header_value_to_map(cx, self, name, value))
+      return false;
+  }
+  
   return true;
 }
 
@@ -3549,13 +3516,12 @@ JSString *geo_info(JSObject *obj) {
 
 static JSString *retrieve_address(JSContext *cx, HandleObject self) {
   RootedString address(cx);
-  char octets[16];
 
-  size_t nwritten = 0;
-  if (!HANDLE_RESULT(cx, xqd_req_downstream_client_ip_addr_get(octets, &nwritten)))
+  fastly_list_u8_t octets;
+  if (!HANDLE_RESULT(cx, xqd_fastly_http_req_downstream_client_ip_addr(&octets)))
     return nullptr;
 
-  switch (nwritten) {
+  switch (octets.len) {
   case 0: {
     // No address to be had, leave `address` as a nullptr.
     break;
@@ -3564,7 +3530,7 @@ static JSString *retrieve_address(JSContext *cx, HandleObject self) {
     char address_chars[INET_ADDRSTRLEN];
     // TODO: do we need to do error handling here, or can we depend on the
     // host giving us a valid address?
-    inet_ntop(AF_INET, octets, address_chars, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, octets.ptr, address_chars, INET_ADDRSTRLEN);
     address = JS_NewStringCopyZ(cx, address_chars);
     if (!address)
       return nullptr;
@@ -3575,7 +3541,7 @@ static JSString *retrieve_address(JSContext *cx, HandleObject self) {
     char address_chars[INET6_ADDRSTRLEN];
     // TODO: do we need to do error handling here, or can we depend on the
     // host giving us a valid address?
-    inet_ntop(AF_INET6, octets, address_chars, INET6_ADDRSTRLEN);
+    inet_ntop(AF_INET6, octets.ptr, address_chars, INET6_ADDRSTRLEN);
     address = JS_NewStringCopyZ(cx, address_chars);
     if (!address)
       return nullptr;
@@ -3732,10 +3698,12 @@ static JSObject *prepare_downstream_request(JSContext *cx) {
 static bool init_downstream_request(JSContext *cx, HandleObject request) {
   MOZ_ASSERT(Request::request_handle(request).handle == INVALID_HANDLE);
 
-  fastly_request_handle_t request_handle = INVALID_HANDLE;
-  fastly_body_handle_t body_handle = INVALID_HANDLE;
-  if (!HANDLE_RESULT(cx, xqd_req_body_downstream_get(&request_handle, &body_handle)))
+  fastly_request_t req;
+  if (!HANDLE_RESULT(cx, xqd_fastly_http_req_body_downstream_get(&req)))
     return false;
+
+  fastly_request_handle_t request_handle = req.f0;
+  fastly_body_handle_t body_handle = req.f1;
 
   JS::SetReservedSlot(request, Request::Slots::Request, JS::Int32Value(request_handle));
   JS::SetReservedSlot(request, Request::Slots::Body, JS::Int32Value(body_handle));
