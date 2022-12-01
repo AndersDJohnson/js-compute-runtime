@@ -1602,8 +1602,8 @@ bool url_get(JSContext *cx, unsigned argc, Value *vp) {
 bool version_get(JSContext *cx, unsigned argc, Value *vp) {
   METHOD_HEADER(0)
 
-  uint32_t version = 0;
-  if (!HANDLE_RESULT(cx, xqd_req_version_get(request_handle(self), &version)))
+  fastly_http_version_t version = 0;
+  if (!HANDLE_RESULT(cx, xqd_fastly_http_req_version_get(request_handle(self), &version)))
     return false;
 
   args.rval().setInt32(version);
@@ -1984,7 +1984,8 @@ JSObject *create(JSContext *cx, HandleObject requestInstance, HandleValue input,
     is_get_or_head = strcmp(method.get(), "GET") == 0 || strcmp(method.get(), "HEAD") == 0;
 
     JS::SetReservedSlot(request, Slots::Method, JS::StringValue(method_str));
-    if (!HANDLE_RESULT(cx, xqd_req_method_set(request_handle, method.get(), method_len))) {
+    xqd_world_string_t method_xqd_str = { method.get(), method_len };
+    if (!HANDLE_RESULT(cx, xqd_fastly_http_req_method_set(request_handle, &method_xqd_str))) {
       return nullptr;
     }
   }
@@ -2609,12 +2610,12 @@ bool constructor(JSContext *cx, unsigned argc, Value *vp) {
   // (implicit)
 
   // 5.  Set `this`’s `response`’s `status` to `init`["status"].
-  if (!HANDLE_RESULT(cx, xqd_resp_status_set(response_handle, status))) {
+  if (!HANDLE_RESULT(cx, xqd_fastly_http_resp_status_set(response_handle, status))) {
     return false;
   }
   // To ensure that we really have the same status value as the host,
   // we always read it back here.
-  if (!HANDLE_RESULT(cx, xqd_resp_status_get(response_handle, &status))) {
+  if (!HANDLE_RESULT(cx, xqd_fastly_http_resp_status_get(response_handle, &status))) {
     return false;
   }
 
@@ -2688,7 +2689,7 @@ JSObject *create(JSContext *cx, HandleObject response, fastly_response_handle_t 
 
   if (is_upstream) {
     uint16_t status = 0;
-    if (!HANDLE_RESULT(cx, xqd_resp_status_get(response_handle, &status)))
+    if (!HANDLE_RESULT(cx, xqd_fastly_http_resp_status_get(response_handle, &status)))
       return nullptr;
 
     JS::SetReservedSlot(response, Slots::Status, JS::Int32Value(status));
@@ -3024,12 +3025,14 @@ bool get_header_names_from_handle(JSContext *cx, uint32_t handle, Mode mode,
   RootedValue name_val(cx);
   for (size_t i = 0; i < ret.len; i++) {
     name = JS_NewStringCopyN(cx, ret.ptr[i].ptr, ret.ptr[i].len);
+    JS_free(cx, ret.ptr[i].ptr);
     if (!name)
       return false;
 
     name_val.setString(name);
     JS::MapSet(cx, backing_map, name_val, JS::NullHandleValue);
   }
+  JS_free(cx, ret.ptr);
   return true;
 }
 
@@ -3059,13 +3062,14 @@ static bool retrieve_value_for_header_from_handle(JSContext *cx, HandleObject se
   RootedString val_str(cx);
   for (size_t i = 0; i < ret.val.len; i++) {
     val_str = JS_NewStringCopyUTF8N(cx, JS::UTF8Chars(ret.val.ptr[i].ptr, ret.val.ptr[i].len));
+    JS_free(cx, ret.val.ptr[i].ptr);
     if (!val_str)
       return false;
     value.setString(val_str);
     if (!append_header_value_to_map(cx, self, name, value))
       return false;
   }
-  
+  JS_free(cx, ret.val.ptr);
   return true;
 }
 
@@ -3705,16 +3709,15 @@ static bool init_downstream_request(JSContext *cx, HandleObject request) {
   JS::SetReservedSlot(request, Request::Slots::Body, JS::Int32Value(body_handle));
 
   // Set the method.
-  OwnedHostCallBuffer buffer;
-  size_t num_written = 0;
-  if (!HANDLE_RESULT(cx, xqd_req_method_get(request_handle, buffer.get(), HOSTCALL_BUFFER_LEN,
-                                            &num_written))) {
+  xqd_world_string_t method_str;
+  if (!HANDLE_RESULT(cx, xqd_fastly_http_req_method_get(request_handle, &method_str))) {
     return false;
   }
 
-  bool is_get = strncmp(buffer.get(), "GET", num_written) == 0;
+  bool is_get = strncmp(method_str.ptr, "GET", method_str.len) == 0;
   if (!is_get) {
-    RootedString method(cx, JS_NewStringCopyN(cx, buffer.get(), num_written));
+    RootedString method(cx, JS_NewStringCopyN(cx, method_str.ptr, method_str.len));
+    JS_free(cx, method_str.ptr);
     if (!method) {
       return false;
     }
@@ -3726,7 +3729,7 @@ static bool init_downstream_request(JSContext *cx, HandleObject request) {
   // TODO: verify if that's right. I.e. whether we should treat all requests
   // that are not GET or HEAD as having a body, which might just be 0-length.
   // It's not entirely clear what else we even could do here though.
-  if (!(is_get || strncmp(buffer.get(), "HEAD", num_written) == 0)) {
+  if (!(is_get || strncmp(method_str.ptr, "HEAD", method_str.len) == 0)) {
     JS::SetReservedSlot(request, Request::Slots::HasBody, JS::TrueValue());
   }
 
@@ -3780,7 +3783,7 @@ bool start_response(JSContext *cx, HandleObject response_obj, bool streaming) {
   fastly_response_handle_t response = Response::response_handle(response_obj);
   fastly_body_handle_t body = RequestOrResponse::body_handle(response_obj);
 
-  return HANDLE_RESULT(cx, xqd_resp_send_downstream(response, body, streaming));
+  return HANDLE_RESULT(cx, xqd_fastly_http_resp_send_downstream(response, body, streaming));
 }
 
 // Steps in this function refer to the spec at
@@ -3895,8 +3898,8 @@ bool respondWithError(JSContext *cx, HandleObject self) {
   fastly_response_handle_t response = INVALID_HANDLE;
   fastly_body_handle_t body;
   return HANDLE_RESULT(cx, xqd_fastly_http_resp_new(&response)) && HANDLE_RESULT(cx, xqd_fastly_http_body_new(&body)) &&
-         HANDLE_RESULT(cx, xqd_resp_status_set(response, 500)) &&
-         HANDLE_RESULT(cx, xqd_resp_send_downstream(response, body, false));
+         HANDLE_RESULT(cx, xqd_fastly_http_resp_status_set(response, 500)) &&
+         HANDLE_RESULT(cx, xqd_fastly_http_resp_send_downstream(response, body, false));
 }
 
 // Step 5 of https://w3c.github.io/ServiceWorker/#wait-until-method
