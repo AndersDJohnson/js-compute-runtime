@@ -441,8 +441,7 @@ bool get_header_value_for_name(JSContext *cx, HandleObject self, HandleValue nam
                                MutableHandleValue rval, const char *fun_name);
 static bool ensure_all_header_values_from_handle(JSContext *cx, HandleObject self,
                                                  HandleObject backing_map);
-typedef FastlyStatus AppendHeaderOperation(int handle, const char *name, size_t name_len,
-                                           const char *value, size_t value_len);
+typedef fastly_error_t AppendHeaderOperation(fastly_request_handle_t handle, xqd_world_string_t *name, xqd_world_string_t* value);
 bool append_header_value(JSContext *cx, HandleObject self, HandleValue name, HandleValue value,
                          const char *fun_name);
 } // namespace detail
@@ -3151,9 +3150,6 @@ static bool ensure_all_header_values_from_handle(JSContext *cx, HandleObject sel
   return true;
 }
 
-typedef FastlyStatus AppendHeaderOperation(int handle, const char *name, size_t name_len,
-                                           const char *value, size_t value_len);
-
 // Appends a non-normalized value for a non-normalized header name to both
 // the JS side Map and, in non-standalone mode, the host.
 //
@@ -3172,11 +3168,12 @@ bool append_header_value(JSContext *cx, HandleObject self, HandleValue name, Han
   if (mode != Mode::Standalone) {
     AppendHeaderOperation *op;
     if (mode == Mode::ProxyToRequest)
-      op = (AppendHeaderOperation *)xqd_req_header_append;
+      op = (AppendHeaderOperation *)xqd_fastly_http_req_header_append;
     else
-      op = (AppendHeaderOperation *)xqd_resp_header_append;
-    if (!HANDLE_RESULT(
-            cx, op(handle(self), name_chars.get(), name_len, value_chars.get(), value_len))) {
+      op = (AppendHeaderOperation *)xqd_fastly_http_resp_header_append;
+    xqd_world_string_t name = { name_chars.get(), name_len };
+    xqd_world_string_t val = { value_chars.get(), value_len };
+    if (!HANDLE_RESULT(cx, op(handle(self), &name, &val))) {
       return false;
     }
   }
