@@ -431,7 +431,8 @@ world xqd-world {
 
     object-store-lookup-as-fd: func(store: object-store-handle, key: string) -> result<option<fd>, error>
 
-    object-store-insert: func(store: object-store-handle, key: string, body-handle: body-handle) -> result<bool, error>
+    // Should object store insert return "inserted" bool?
+    object-store-insert: func(store: object-store-handle, key: string, body-handle: body-handle) -> result<_, error>
 
 
     /*

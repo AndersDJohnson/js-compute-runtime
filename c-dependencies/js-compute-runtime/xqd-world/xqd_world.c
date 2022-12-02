@@ -1169,7 +1169,7 @@ fastly_error_t fastly_http_req_register_dynamic_backend(xqd_world_string_t *pref
   } else {
     *((int8_t*)(ptr + 96)) = 0;
   }
-  {
+    {
     __attribute__((aligned(1)))
     uint8_t ret_area[2];
     int32_t ptr21 = (int32_t) &ret_area;
@@ -1778,16 +1778,15 @@ fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t sto
   return result.is_err ? result.val.err : -1;
 }
 
-fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle, bool *ret) {
+fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle) {
   __attribute__((aligned(1)))
   uint8_t ret_area[2];
   int32_t ptr = (int32_t) &ret_area;
   __wasm_import_fastly_object_store_insert((int32_t) (store), (int32_t) (*key).ptr, (int32_t) (*key).len, (int32_t) (body_handle), ptr);
-  fastly_result_bool_error_t result;
+  fastly_result_void_error_t result;
   switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
       result.is_err = false;
-      result.val.ok = (int32_t) (*((uint8_t*) (ptr + 1)));
       break;
     }
     case 1: {
@@ -1796,7 +1795,6 @@ fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xq
       break;
     }
   }
-  *ret = result.val.ok;
   return result.is_err ? result.val.err : -1;
 }
 

@@ -770,7 +770,7 @@ fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t sto
 
 __attribute__((import_module("fastly"), import_name("object-store-insert")))
 void __wasm_import_fastly_object_store_insert(int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle, bool *ret);
+fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle);
 
 __attribute__((import_module("fastly"), import_name("secret-store-open")))
 void __wasm_import_fastly_secret_store_open(int32_t, int32_t, int32_t);

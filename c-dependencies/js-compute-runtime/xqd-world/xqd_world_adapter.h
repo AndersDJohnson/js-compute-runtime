@@ -87,7 +87,7 @@ fastly_error_t xqd_fastly_kv_insert(fastly_kv_store_handle_t store, fastly_list_
 fastly_error_t xqd_fastly_object_store_open(xqd_world_string_t *name, fastly_object_store_handle_t *ret);
 fastly_error_t xqd_fastly_object_store_lookup(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_option_body_handle_t *ret);
 fastly_error_t xqd_fastly_object_store_lookup_as_fd(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_option_fd_t *ret);
-fastly_error_t xqd_fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle, bool *ret);
+fastly_error_t xqd_fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle);
 fastly_error_t xqd_fastly_secret_store_open(xqd_world_string_t *name, fastly_secret_store_handle_t *ret);
 fastly_error_t xqd_fastly_secret_store_get(fastly_secret_store_handle_t store, xqd_world_string_t *key, fastly_option_secret_handle_t *ret);
 fastly_error_t xqd_fastly_secret_store_plaintext(fastly_secret_handle_t secret, fastly_option_string_t *ret);

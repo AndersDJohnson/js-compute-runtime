@@ -546,8 +546,17 @@ fastly_error_t xqd_fastly_object_store_open(xqd_world_string_t *name,
 }
 
 fastly_error_t xqd_fastly_object_store_lookup(fastly_object_store_handle_t store,
-                                              xqd_world_string_t *key, fastly_body_handle_t *ret) {
-  return convert_result(xqd_object_store_get(store, key->ptr, key->len, ret));
+                                              xqd_world_string_t *key,
+                                              fastly_option_body_handle_t *ret) {
+  ret->val = INVALID_HANDLE;
+  fastly_error_t result =
+      convert_result(xqd_object_store_get(store, key->ptr, key->len, &ret->val));
+  if (result == FASTLY_ERROR_OPTIONAL_NONE || ret->val == INVALID_HANDLE) {
+    ret->is_some = false;
+    return FASTLY_RESULT_ERROR_OK;
+  }
+  ret->is_some = true;
+  return result;
 }
 
 fastly_error_t xqd_fastly_object_store_insert(fastly_object_store_handle_t store,
@@ -881,16 +890,16 @@ fastly_error_t xqd_fastly_object_store_lookup_as_fd(fastly_object_store_handle_t
 }
 fastly_error_t xqd_fastly_object_store_insert(fastly_object_store_handle_t store,
                                               xqd_world_string_t *key,
-                                              fastly_body_handle_t body_handle,
-                                              bool *ret) {
-  return fastly_object_store_insert(store, key, body_handle, ret);
+                                              fastly_body_handle_t body_handle) {
+  return fastly_object_store_insert(store, key, body_handle);
 }
 fastly_error_t xqd_fastly_secret_store_open(xqd_world_string_t *name,
                                             fastly_secret_store_handle_t *ret) {
   return fastly_secret_store_open(name, ret);
 }
 fastly_error_t xqd_fastly_secret_store_get(fastly_secret_store_handle_t store,
-                                           xqd_world_string_t *key, fastly_option_secret_handle_t *ret) {
+                                           xqd_world_string_t *key,
+                                           fastly_option_secret_handle_t *ret) {
   return fastly_secret_store_get(store, key, ret);
 }
 fastly_error_t xqd_fastly_secret_store_plaintext(fastly_secret_handle_t secret,
