@@ -513,7 +513,8 @@ fastly_error_t xqd_fastly_dictionary_open(xqd_world_string_t *name,
 fastly_error_t xqd_fastly_dictionary_get(fastly_dictionary_handle_t h, xqd_world_string_t *key,
                                          fastly_option_string_t *ret) {
   ret->val.ptr = static_cast<char *>(JS_malloc(context, DICTIONARY_ENTRY_MAX_LEN));
-  fastly_error_t result = convert_result(xqd_dictionary_get(h, key->ptr, key->len, ret->val.ptr, DICTIONARY_ENTRY_MAX_LEN, &ret->val.len));
+  fastly_error_t result = convert_result(xqd_dictionary_get(
+      h, key->ptr, key->len, ret->val.ptr, DICTIONARY_ENTRY_MAX_LEN, &ret->val.len));
   if (result == FASTLY_ERROR_OPTIONAL_NONE) {
     ret->is_some = false;
     return FASTLY_RESULT_ERROR_OK;
