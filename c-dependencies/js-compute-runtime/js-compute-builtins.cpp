@@ -3412,7 +3412,7 @@ bool init_class(JSContext *cx, HandleObject global) {
     return false;
 
   JS::SymbolCode code = JS::SymbolCode::iterator;
-  JS::RootedId iteratorId(cx, SYMBOL_TO_JSID(JS::GetWellKnownSymbol(cx, code)));
+  JS::RootedId iteratorId(cx, JS::GetWellKnownSymbolKey(cx, code));
   return JS_DefinePropertyById(cx, proto_obj, iteratorId, entries, 0);
 }
 
