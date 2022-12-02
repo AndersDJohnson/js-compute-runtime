@@ -1550,16 +1550,29 @@ fastly_error_t fastly_dictionary_open(xqd_world_string_t *name, fastly_dictionar
   return result.is_err ? result.val.err : -1;
 }
 
-fastly_error_t fastly_dictionary_get(fastly_dictionary_handle_t h, xqd_world_string_t *key, xqd_world_string_t *ret) {
+fastly_error_t fastly_dictionary_get(fastly_dictionary_handle_t h, xqd_world_string_t *key, fastly_option_string_t *ret) {
   __attribute__((aligned(4)))
-  uint8_t ret_area[12];
+  uint8_t ret_area[16];
   int32_t ptr = (int32_t) &ret_area;
   __wasm_import_fastly_dictionary_get((int32_t) (h), (int32_t) (*key).ptr, (int32_t) (*key).len, ptr);
-  fastly_result_string_error_t result;
+  fastly_result_option_string_error_t result;
   switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
       result.is_err = false;
-      result.val.ok = (xqd_world_string_t) { (char*)(*((int32_t*) (ptr + 4))), (size_t)(*((int32_t*) (ptr + 8))) };
+      fastly_option_string_t option;
+      switch ((int32_t) (*((uint8_t*) (ptr + 4)))) {
+        case 0: {
+          option.is_some = false;
+          break;
+        }
+        case 1: {
+          option.is_some = true;
+          option.val = (xqd_world_string_t) { (char*)(*((int32_t*) (ptr + 8))), (size_t)(*((int32_t*) (ptr + 12))) };
+          break;
+        }
+      }
+      
+      result.val.ok = option;
       break;
     }
     case 1: {
@@ -1616,16 +1629,29 @@ fastly_error_t fastly_kv_open(xqd_world_string_t *name, fastly_kv_store_handle_t
   return result.is_err ? result.val.err : -1;
 }
 
-fastly_error_t fastly_kv_lookup(fastly_kv_store_handle_t store, fastly_list_u8_t *key, fastly_body_handle_t *ret) {
+fastly_error_t fastly_kv_lookup(fastly_kv_store_handle_t store, fastly_list_u8_t *key, fastly_option_body_handle_t *ret) {
   __attribute__((aligned(4)))
-  uint8_t ret_area[8];
+  uint8_t ret_area[12];
   int32_t ptr = (int32_t) &ret_area;
   __wasm_import_fastly_kv_lookup((int32_t) (store), (int32_t) (*key).ptr, (int32_t) (*key).len, ptr);
-  fastly_result_body_handle_error_t result;
+  fastly_result_option_body_handle_error_t result;
   switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
       result.is_err = false;
-      result.val.ok = (uint32_t) (*((int32_t*) (ptr + 4)));
+      fastly_option_body_handle_t option;
+      switch ((int32_t) (*((uint8_t*) (ptr + 4)))) {
+        case 0: {
+          option.is_some = false;
+          break;
+        }
+        case 1: {
+          option.is_some = true;
+          option.val = (uint32_t) (*((int32_t*) (ptr + 8)));
+          break;
+        }
+      }
+      
+      result.val.ok = option;
       break;
     }
     case 1: {
@@ -1682,16 +1708,29 @@ fastly_error_t fastly_object_store_open(xqd_world_string_t *name, fastly_object_
   return result.is_err ? result.val.err : -1;
 }
 
-fastly_error_t fastly_object_store_lookup(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t *ret) {
+fastly_error_t fastly_object_store_lookup(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_option_body_handle_t *ret) {
   __attribute__((aligned(4)))
-  uint8_t ret_area[8];
+  uint8_t ret_area[12];
   int32_t ptr = (int32_t) &ret_area;
   __wasm_import_fastly_object_store_lookup((int32_t) (store), (int32_t) (*key).ptr, (int32_t) (*key).len, ptr);
-  fastly_result_body_handle_error_t result;
+  fastly_result_option_body_handle_error_t result;
   switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
       result.is_err = false;
-      result.val.ok = (uint32_t) (*((int32_t*) (ptr + 4)));
+      fastly_option_body_handle_t option;
+      switch ((int32_t) (*((uint8_t*) (ptr + 4)))) {
+        case 0: {
+          option.is_some = false;
+          break;
+        }
+        case 1: {
+          option.is_some = true;
+          option.val = (uint32_t) (*((int32_t*) (ptr + 8)));
+          break;
+        }
+      }
+      
+      result.val.ok = option;
       break;
     }
     case 1: {
@@ -1704,16 +1743,29 @@ fastly_error_t fastly_object_store_lookup(fastly_object_store_handle_t store, xq
   return result.is_err ? result.val.err : -1;
 }
 
-fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_fd_t *ret) {
+fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_option_fd_t *ret) {
   __attribute__((aligned(4)))
-  uint8_t ret_area[8];
+  uint8_t ret_area[12];
   int32_t ptr = (int32_t) &ret_area;
   __wasm_import_fastly_object_store_lookup_as_fd((int32_t) (store), (int32_t) (*key).ptr, (int32_t) (*key).len, ptr);
-  fastly_result_fd_error_t result;
+  fastly_result_option_fd_error_t result;
   switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
       result.is_err = false;
-      result.val.ok = (uint32_t) (*((int32_t*) (ptr + 4)));
+      fastly_option_fd_t option;
+      switch ((int32_t) (*((uint8_t*) (ptr + 4)))) {
+        case 0: {
+          option.is_some = false;
+          break;
+        }
+        case 1: {
+          option.is_some = true;
+          option.val = (uint32_t) (*((int32_t*) (ptr + 8)));
+          break;
+        }
+      }
+      
+      result.val.ok = option;
       break;
     }
     case 1: {
@@ -1726,15 +1778,16 @@ fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t sto
   return result.is_err ? result.val.err : -1;
 }
 
-fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle) {
+fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle, bool *ret) {
   __attribute__((aligned(1)))
   uint8_t ret_area[2];
   int32_t ptr = (int32_t) &ret_area;
   __wasm_import_fastly_object_store_insert((int32_t) (store), (int32_t) (*key).ptr, (int32_t) (*key).len, (int32_t) (body_handle), ptr);
-  fastly_result_void_error_t result;
+  fastly_result_bool_error_t result;
   switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
       result.is_err = false;
+      result.val.ok = (int32_t) (*((uint8_t*) (ptr + 1)));
       break;
     }
     case 1: {
@@ -1743,6 +1796,7 @@ fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xq
       break;
     }
   }
+  *ret = result.val.ok;
   return result.is_err ? result.val.err : -1;
 }
 
@@ -1768,16 +1822,29 @@ fastly_error_t fastly_secret_store_open(xqd_world_string_t *name, fastly_secret_
   return result.is_err ? result.val.err : -1;
 }
 
-fastly_error_t fastly_secret_store_get(fastly_secret_store_handle_t store, xqd_world_string_t *key, fastly_secret_handle_t *ret) {
+fastly_error_t fastly_secret_store_get(fastly_secret_store_handle_t store, xqd_world_string_t *key, fastly_option_secret_handle_t *ret) {
   __attribute__((aligned(4)))
-  uint8_t ret_area[8];
+  uint8_t ret_area[12];
   int32_t ptr = (int32_t) &ret_area;
   __wasm_import_fastly_secret_store_get((int32_t) (store), (int32_t) (*key).ptr, (int32_t) (*key).len, ptr);
-  fastly_result_secret_handle_error_t result;
+  fastly_result_option_secret_handle_error_t result;
   switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
       result.is_err = false;
-      result.val.ok = (uint32_t) (*((int32_t*) (ptr + 4)));
+      fastly_option_secret_handle_t option;
+      switch ((int32_t) (*((uint8_t*) (ptr + 4)))) {
+        case 0: {
+          option.is_some = false;
+          break;
+        }
+        case 1: {
+          option.is_some = true;
+          option.val = (uint32_t) (*((int32_t*) (ptr + 8)));
+          break;
+        }
+      }
+      
+      result.val.ok = option;
       break;
     }
     case 1: {
@@ -1790,16 +1857,29 @@ fastly_error_t fastly_secret_store_get(fastly_secret_store_handle_t store, xqd_w
   return result.is_err ? result.val.err : -1;
 }
 
-fastly_error_t fastly_secret_store_plaintext(fastly_secret_handle_t secret, xqd_world_string_t *ret) {
+fastly_error_t fastly_secret_store_plaintext(fastly_secret_handle_t secret, fastly_option_string_t *ret) {
   __attribute__((aligned(4)))
-  uint8_t ret_area[12];
+  uint8_t ret_area[16];
   int32_t ptr = (int32_t) &ret_area;
   __wasm_import_fastly_secret_store_plaintext((int32_t) (secret), ptr);
-  fastly_result_string_error_t result;
+  fastly_result_option_string_error_t result;
   switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
       result.is_err = false;
-      result.val.ok = (xqd_world_string_t) { (char*)(*((int32_t*) (ptr + 4))), (size_t)(*((int32_t*) (ptr + 8))) };
+      fastly_option_string_t option;
+      switch ((int32_t) (*((uint8_t*) (ptr + 4)))) {
+        case 0: {
+          option.is_some = false;
+          break;
+        }
+        case 1: {
+          option.is_some = true;
+          option.val = (xqd_world_string_t) { (char*)(*((int32_t*) (ptr + 8))), (size_t)(*((int32_t*) (ptr + 12))) };
+          break;
+        }
+      }
+      
+      result.val.ok = option;
       break;
     }
     case 1: {

@@ -26,7 +26,7 @@ typedef uint8_t fastly_error_t;
 #define FASTLY_ERROR_HTTP_INVALID 7
 #define FASTLY_ERROR_HTTP_USER 8
 #define FASTLY_ERROR_HTTP_INCOMPLETE 9
-#define FASTLY_ERROR_MISSING_OPTIONAL 10
+#define FASTLY_ERROR_OPTIONAL_NONE 10
 #define FASTLY_ERROR_HTTP_HEAD_TOO_LARGE 11
 #define FASTLY_ERROR_HTTP_INVALID_STATUS 12
 #define FASTLY_RESULT_ERROR_OK 255
@@ -407,6 +407,19 @@ typedef struct {
 } fastly_result_kv_store_handle_error_t;
 
 typedef struct {
+  bool is_some;
+  fastly_body_handle_t val;
+} fastly_option_body_handle_t;
+
+typedef struct {
+  bool is_err;
+  union {
+    fastly_option_body_handle_t ok;
+    fastly_error_t err;
+  } val;
+} fastly_result_option_body_handle_error_t;
+
+typedef struct {
   bool is_err;
   union {
     fastly_object_store_handle_t ok;
@@ -415,12 +428,17 @@ typedef struct {
 } fastly_result_object_store_handle_error_t;
 
 typedef struct {
+  bool is_some;
+  fastly_fd_t val;
+} fastly_option_fd_t;
+
+typedef struct {
   bool is_err;
   union {
-    fastly_fd_t ok;
+    fastly_option_fd_t ok;
     fastly_error_t err;
   } val;
-} fastly_result_fd_error_t;
+} fastly_result_option_fd_error_t;
 
 typedef struct {
   bool is_err;
@@ -431,12 +449,17 @@ typedef struct {
 } fastly_result_secret_store_handle_error_t;
 
 typedef struct {
+  bool is_some;
+  fastly_secret_handle_t val;
+} fastly_option_secret_handle_t;
+
+typedef struct {
   bool is_err;
   union {
-    fastly_secret_handle_t ok;
+    fastly_option_secret_handle_t ok;
     fastly_error_t err;
   } val;
-} fastly_result_secret_handle_error_t;
+} fastly_result_option_secret_handle_error_t;
 
 typedef struct {
   bool is_err;
@@ -715,7 +738,7 @@ fastly_error_t fastly_dictionary_open(xqd_world_string_t *name, fastly_dictionar
 
 __attribute__((import_module("fastly"), import_name("dictionary-get")))
 void __wasm_import_fastly_dictionary_get(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_dictionary_get(fastly_dictionary_handle_t h, xqd_world_string_t *key, xqd_world_string_t *ret);
+fastly_error_t fastly_dictionary_get(fastly_dictionary_handle_t h, xqd_world_string_t *key, fastly_option_string_t *ret);
 
 __attribute__((import_module("fastly"), import_name("geo-lookup")))
 void __wasm_import_fastly_geo_lookup(int32_t, int32_t, int32_t);
@@ -727,7 +750,7 @@ fastly_error_t fastly_kv_open(xqd_world_string_t *name, fastly_kv_store_handle_t
 
 __attribute__((import_module("fastly"), import_name("kv-lookup")))
 void __wasm_import_fastly_kv_lookup(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_kv_lookup(fastly_kv_store_handle_t store, fastly_list_u8_t *key, fastly_body_handle_t *ret);
+fastly_error_t fastly_kv_lookup(fastly_kv_store_handle_t store, fastly_list_u8_t *key, fastly_option_body_handle_t *ret);
 
 __attribute__((import_module("fastly"), import_name("kv-insert")))
 void __wasm_import_fastly_kv_insert(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
@@ -739,15 +762,15 @@ fastly_error_t fastly_object_store_open(xqd_world_string_t *name, fastly_object_
 
 __attribute__((import_module("fastly"), import_name("object-store-lookup")))
 void __wasm_import_fastly_object_store_lookup(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_object_store_lookup(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t *ret);
+fastly_error_t fastly_object_store_lookup(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_option_body_handle_t *ret);
 
 __attribute__((import_module("fastly"), import_name("object-store-lookup-as-fd")))
 void __wasm_import_fastly_object_store_lookup_as_fd(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_fd_t *ret);
+fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_option_fd_t *ret);
 
 __attribute__((import_module("fastly"), import_name("object-store-insert")))
 void __wasm_import_fastly_object_store_insert(int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle);
+fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle, bool *ret);
 
 __attribute__((import_module("fastly"), import_name("secret-store-open")))
 void __wasm_import_fastly_secret_store_open(int32_t, int32_t, int32_t);
@@ -755,11 +778,11 @@ fastly_error_t fastly_secret_store_open(xqd_world_string_t *name, fastly_secret_
 
 __attribute__((import_module("fastly"), import_name("secret-store-get")))
 void __wasm_import_fastly_secret_store_get(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_secret_store_get(fastly_secret_store_handle_t store, xqd_world_string_t *key, fastly_secret_handle_t *ret);
+fastly_error_t fastly_secret_store_get(fastly_secret_store_handle_t store, xqd_world_string_t *key, fastly_option_secret_handle_t *ret);
 
 __attribute__((import_module("fastly"), import_name("secret-store-plaintext")))
 void __wasm_import_fastly_secret_store_plaintext(int32_t, int32_t);
-fastly_error_t fastly_secret_store_plaintext(fastly_secret_handle_t secret, xqd_world_string_t *ret);
+fastly_error_t fastly_secret_store_plaintext(fastly_secret_handle_t secret, fastly_option_string_t *ret);
 
 __attribute__((import_module("fastly"), import_name("backend-is-healthy")))
 void __wasm_import_fastly_backend_is_healthy(int32_t, int32_t, int32_t);

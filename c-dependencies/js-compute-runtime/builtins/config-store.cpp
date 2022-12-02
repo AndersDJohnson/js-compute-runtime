@@ -11,25 +11,24 @@ fastly_dictionary_handle_t ConfigStore::config_store_handle(JSObject *obj) {
 bool ConfigStore::get(JSContext *cx, unsigned argc, JS::Value *vp) {
   METHOD_HEADER(1)
 
-  size_t name_len;
-  JS::UniqueChars name = encode(cx, args[0], &name_len);
+  xqd_world_string_t key_str;
+  JS::UniqueChars key = encode(cx, args[0], &key_str.len);
+  key_str.ptr = key.get();
 
-  OwnedHostCallBuffer buffer;
-  size_t nwritten = 0;
-  auto status = convert_to_fastly_status(
-      xqd_dictionary_get(ConfigStore::config_store_handle(self), name.get(), name_len,
-                           buffer.get(), CONFIG_STORE_ENTRY_MAX_LEN, &nwritten));
-  // FastlyStatus::none indicates the key wasn't found, so we return null.
-  if (status == FastlyStatus::None) {
-    args.rval().setNull();
-    return true;
-  }
+  fastly_option_string_t ret;
+  auto status = convert_to_fastly_status(xqd_fastly_dictionary_get(ConfigStore::config_store_handle(self), &key_str, &ret));
 
   // Ensure that we throw an exception for all unexpected host errors.
   if (!HANDLE_RESULT(cx, status))
     return false;
 
-  JS::RootedString text(cx, JS_NewStringCopyUTF8N(cx, JS::UTF8Chars(buffer.get(), nwritten)));
+  if (!ret.is_some) {
+    args.rval().setNull();
+    return true;
+  }
+
+  JS::RootedString text(cx, JS_NewStringCopyUTF8N(cx, JS::UTF8Chars(ret.val.ptr, ret.val.len)));
+  JS_free(cx, ret.val.ptr);
   if (!text)
     return false;
 
@@ -45,11 +44,13 @@ bool ConfigStore::constructor(JSContext *cx, unsigned argc, JS::Value *vp) {
   REQUEST_HANDLER_ONLY("The ConfigStore builtin");
   CTOR_HEADER("ConfigStore", 1);
 
-  size_t name_len;
-  JS::UniqueChars name = encode(cx, args[0], &name_len);
+  xqd_world_string_t name_str;
+  JS::UniqueChars name = encode(cx, args[0], &name_str.len);
+  name_str.ptr = name.get();
+
   JS::RootedObject config_store(cx, JS_NewObjectForConstructor(cx, &class_, args));
   fastly_dictionary_handle_t dict_handle = INVALID_HANDLE;
-  if (!HANDLE_RESULT(cx, xqd_dictionary_open(name.get(), name_len, &dict_handle)))
+  if (!HANDLE_RESULT(cx, xqd_fastly_dictionary_open(&name_str, &dict_handle)))
     return false;
 
   JS::SetReservedSlot(config_store, ConfigStore::Slots::Handle,

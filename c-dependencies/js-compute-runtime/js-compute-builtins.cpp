@@ -125,13 +125,6 @@ bool enqueue_internal_method(JSContext *cx, HandleObject receiver,
   return JS::AddPromiseReactions(cx, promise, method, nullptr);
 }
 
-// Ensure that all the things we want to use the hostcall buffer for actually
-// fit into the buffer.
-#define HOSTCALL_BUFFER_LEN HEADER_MAX_LEN
-static_assert(DICTIONARY_ENTRY_MAX_LEN < HOSTCALL_BUFFER_LEN);
-static_assert(METHOD_MAX_LEN < HOSTCALL_BUFFER_LEN);
-static_assert(URI_MAX_LEN < HOSTCALL_BUFFER_LEN);
-
 using jsurl::SpecSlice, jsurl::SpecString, jsurl::JSUrl, jsurl::JSUrlSearchParams,
     jsurl::JSSearchParam;
 
@@ -3733,24 +3726,27 @@ static bool init_downstream_request(JSContext *cx, HandleObject request) {
     JS::SetReservedSlot(request, Request::Slots::HasBody, JS::TrueValue());
   }
 
-  size_t bytes_read;
-  UniqueChars buf(read_from_handle_all<xqd_req_uri_get, fastly_request_handle_t>(
-      cx, request_handle, &bytes_read, false));
-  if (!buf)
+  xqd_world_string_t uri_str;
+  if (!HANDLE_RESULT(cx, xqd_fastly_http_req_uri_get(request_handle, &uri_str)))
     return false;
 
-  RootedString url(cx, JS_NewStringCopyN(cx, buf.get(), bytes_read));
-  if (!url)
+  RootedString url(cx, JS_NewStringCopyN(cx, uri_str.ptr, uri_str.len));
+  if (!url) {
+    JS_free(cx, uri_str.ptr);
     return false;
+  }
   JS::SetReservedSlot(request, Request::Slots::URL, JS::StringValue(url));
 
   // Set the URL for `globalThis.location` to the client request's URL.
   RootedObject url_instance(cx, JS_NewObjectWithGivenProto(cx, &URL::class_, URL::proto_obj));
-  if (!url_instance)
+  if (!url_instance) {
+    JS_free(cx, uri_str.ptr);
     return false;
+  }
 
-  SpecString spec((uint8_t *)buf.release(), bytes_read, bytes_read);
+  SpecString spec(reinterpret_cast<uint8_t*>(uri_str.ptr), uri_str.len, uri_str.len);
   builtins::WorkerLocation::url = URL::create(cx, url_instance, spec);
+  JS_free(cx, uri_str.ptr);
   if (!builtins::WorkerLocation::url) {
     return false;
   }
@@ -4571,16 +4567,16 @@ bool fetch(JSContext *cx, unsigned argc, Value *vp) {
     } else {
       backend = builtins::Fastly::defaultBackend;
       if (!backend) {
-        size_t bytes_read;
         fastly_request_handle_t handle = Request::request_handle(request);
-        UniqueChars buf(read_from_handle_all<xqd_req_uri_get, fastly_request_handle_t>(
-            cx, handle, &bytes_read, false));
-        if (buf) {
+        
+        xqd_world_string_t uri_str;
+        if (HANDLE_RESULT(cx, xqd_fastly_http_req_uri_get(handle, &uri_str))) {
           JS_ReportErrorUTF8(cx,
                              "No backend specified for request with url %s. "
                              "Must provide a `backend` property on the `init` object "
                              "passed to either `new Request()` or `fetch`",
-                             buf.get());
+                             uri_str.ptr);
+          JS_free(cx, uri_str.ptr);
         }
         return ReturnPromiseRejectedWithPendingError(cx, args);
       }
