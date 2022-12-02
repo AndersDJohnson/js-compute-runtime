@@ -115,21 +115,20 @@ bool init_js() {
   if (!js::UseInternalJobQueues(cx) || !JS::InitSelfHostedCode(cx))
     return false;
 
-  // TODO: where did these go?
-  // JS::ContextOptionsRef(cx)
-  //     .setPrivateClassFields(true)
-  //     .setPrivateClassMethods(true)
-  //     .setClassStaticBlocks(true)
-  //     .setErgnomicBrandChecks(true);
+  JS::ContextOptionsRef(cx)
+      .setPrivateClassFields(true)
+      .setPrivateClassMethods(true)
+      .setClassStaticBlocks(true)
+      .setErgnomicBrandChecks(true);
 
   // TODO: check if we should set a different creation zone.
   JS::RealmOptions options;
   options.creationOptions()
       .setStreamsEnabled(true)
-      // .setReadableByteStreamsEnabled(true)
-      // .setBYOBStreamReadersEnabled(true)
-      // .setReadableStreamPipeToEnabled(true)
-      // .setWritableStreamsEnabled(true)
+      .setReadableByteStreamsEnabled(true)
+      .setBYOBStreamReadersEnabled(true)
+      .setReadableStreamPipeToEnabled(true)
+      .setWritableStreamsEnabled(true)
       .setIteratorHelpersEnabled(true)
       .setWeakRefsEnabled(JS::WeakRefSpecifier::EnabledWithoutCleanupSome);
 
