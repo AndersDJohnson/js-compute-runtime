@@ -142,7 +142,7 @@ JS::Result<mozilla::Ok> Backend::register_dynamic_backend(JSContext *cx, JS::Han
     size_t hostOverride_len;
     JS::UniqueChars hostOverrideChars = encode(cx, hostOverrideString, &hostOverride_len);
     hostOverride = std::string(hostOverrideChars.get(), hostOverride_len);
-    backend_config.host_override.val.ptr = const_cast<char*>(hostOverride.c_str());
+    backend_config.host_override.val.ptr = const_cast<char *>(hostOverride.c_str());
     backend_config.host_override.val.len = hostOverride.length();
   }
 
@@ -157,7 +157,8 @@ JS::Result<mozilla::Ok> Backend::register_dynamic_backend(JSContext *cx, JS::Han
   }
 
   auto betweenBytesTimeoutSlot = JS::GetReservedSlot(backend, Backend::Slots::BetweenBytesTimeout);
-  if ((backend_config.between_bytes_timeout.is_some = !betweenBytesTimeoutSlot.isNullOrUndefined())) {
+  if ((backend_config.between_bytes_timeout.is_some =
+           !betweenBytesTimeoutSlot.isNullOrUndefined())) {
     backend_config.between_bytes_timeout.val = betweenBytesTimeoutSlot.toInt32();
   }
 
@@ -184,7 +185,7 @@ JS::Result<mozilla::Ok> Backend::register_dynamic_backend(JSContext *cx, JS::Han
     JS::UniqueChars certificateHostnameChars =
         encode(cx, certificateHostnameString, &certificateHostname_len);
     certificateHostname = std::string(certificateHostnameChars.get(), certificateHostname_len);
-    backend_config.cert_hostname.val.ptr = const_cast<char*>(certificateHostname.c_str());
+    backend_config.cert_hostname.val.ptr = const_cast<char *>(certificateHostname.c_str());
     backend_config.cert_hostname.val.len = certificateHostname.length();
   }
 
@@ -195,7 +196,7 @@ JS::Result<mozilla::Ok> Backend::register_dynamic_backend(JSContext *cx, JS::Han
     size_t caCertificate_len;
     JS::UniqueChars caCertificateChars = encode(cx, caCertificateString, &caCertificate_len);
     caCertificate = std::string(caCertificateChars.get(), caCertificate_len);
-    backend_config.ca_cert.val.ptr = const_cast<char*>(caCertificate.c_str());
+    backend_config.ca_cert.val.ptr = const_cast<char *>(caCertificate.c_str());
     backend_config.ca_cert.val.len = caCertificate.length();
   }
 
@@ -206,7 +207,7 @@ JS::Result<mozilla::Ok> Backend::register_dynamic_backend(JSContext *cx, JS::Han
     size_t ciphers_len;
     JS::UniqueChars ciphersChars = encode(cx, ciphersString, &ciphers_len);
     ciphers = std::string(ciphersChars.get(), ciphers_len);
-    backend_config.ciphers.val.ptr = const_cast<char*>(ciphers.c_str());
+    backend_config.ciphers.val.ptr = const_cast<char *>(ciphers.c_str());
     backend_config.ciphers.val.len = ciphers.length();
   }
 
@@ -217,11 +218,12 @@ JS::Result<mozilla::Ok> Backend::register_dynamic_backend(JSContext *cx, JS::Han
     size_t sniHostname_len;
     JS::UniqueChars sniHostnameChars = encode(cx, sniHostnameString, &sniHostname_len);
     sniHostname = std::string(sniHostnameChars.get(), sniHostname_len);
-    backend_config.sni_hostname.val.ptr = const_cast<char*>(sniHostname.c_str());
+    backend_config.sni_hostname.val.ptr = const_cast<char *>(sniHostname.c_str());
     backend_config.sni_hostname.val.len = sniHostname.length();
   }
 
-  auto result = xqd_fastly_http_req_register_dynamic_backend(&name_str, &target_str, &backend_config);
+  auto result =
+      xqd_fastly_http_req_register_dynamic_backend(&name_str, &target_str, &backend_config);
   if (!HANDLE_RESULT(cx, result)) {
     return JS::Result<mozilla::Ok>(JS::Error());
   } else {

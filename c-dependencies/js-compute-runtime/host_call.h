@@ -7,8 +7,8 @@
 #include "jsapi.h"
 #pragma clang diagnostic pop
 
-#include "xqd.h"
 #include "xqd-world/xqd_world_adapter.h"
+#include "xqd.h"
 
 enum class FastlyStatus {
   // Success value.

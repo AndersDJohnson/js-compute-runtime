@@ -434,8 +434,8 @@ bool get_header_value_for_name(JSContext *cx, HandleObject self, HandleValue nam
                                MutableHandleValue rval, const char *fun_name);
 static bool ensure_all_header_values_from_handle(JSContext *cx, HandleObject self,
                                                  HandleObject backing_map);
-typedef fastly_error_t AppendHeaderOperation(fastly_request_handle_t handle, xqd_world_string_t *name,
-                                             xqd_world_string_t* value);
+typedef fastly_error_t AppendHeaderOperation(fastly_request_handle_t handle,
+                                             xqd_world_string_t *name, xqd_world_string_t *value);
 bool append_header_value(JSContext *cx, HandleObject self, HandleValue name, HandleValue value,
                          const char *fun_name);
 } // namespace detail
@@ -446,13 +446,14 @@ JSObject *create(JSContext *cx, HandleObject headers, Mode mode, HandleObject ow
 const unsigned ctor_length = 1;
 bool check_receiver(JSContext *cx, HandleValue receiver, const char *method_name);
 bool get(JSContext *cx, unsigned argc, Value *vp);
-typedef FastlyStatus HeaderValueSetOperation(fastly_request_handle_t handle, xqd_world_string_t *name,
-                                              xqd_world_string_t *value);
+typedef FastlyStatus HeaderValueSetOperation(fastly_request_handle_t handle,
+                                             xqd_world_string_t *name, xqd_world_string_t *value);
 bool set(JSContext *cx, unsigned argc, Value *vp);
 bool has(JSContext *cx, unsigned argc, Value *vp);
 bool append(JSContext *cx, unsigned argc, Value *vp);
 bool maybe_add(JSContext *cx, HandleObject self, const char *name, const char *value);
-typedef FastlyStatus HeaderRemoveOperation(fastly_request_handle_t handle, xqd_world_string_t *name);
+typedef FastlyStatus HeaderRemoveOperation(fastly_request_handle_t handle,
+                                           xqd_world_string_t *name);
 bool delete_(JSContext *cx, unsigned argc, Value *vp);
 bool forEach(JSContext *cx, unsigned argc, Value *vp);
 bool entries(JSContext *cx, unsigned argc, Value *vp);
@@ -1565,9 +1566,8 @@ bool apply_cache_override(JSContext *cx, HandleObject self) {
     sk_str.ptr = sk_chars.release();
   }
 
-  return HANDLE_RESULT(cx, xqd_fastly_http_req_cache_override_set(request_handle(self), tag,
-                                                                  &ttl_option, &swr_option,
-                                                                  &sk_opt));
+  return HANDLE_RESULT(cx, xqd_fastly_http_req_cache_override_set(
+                               request_handle(self), tag, &ttl_option, &swr_option, &sk_opt));
 }
 
 const unsigned ctor_length = 1;
@@ -1836,7 +1836,7 @@ JSObject *create(JSContext *cx, HandleObject requestInstance, HandleValue input,
   RequestOrResponse::set_url(request, StringValue(url_str));
   size_t url_len;
   UniqueChars url = encode(cx, url_str, &url_len);
-  xqd_world_string_t url_xqd_str { url.get(), url_len };
+  xqd_world_string_t url_xqd_str{url.get(), url_len};
   if (!url || !HANDLE_RESULT(cx, xqd_fastly_http_req_uri_set(request_handle, &url_xqd_str))) {
     return nullptr;
   }
@@ -1977,7 +1977,7 @@ JSObject *create(JSContext *cx, HandleObject requestInstance, HandleValue input,
     is_get_or_head = strcmp(method.get(), "GET") == 0 || strcmp(method.get(), "HEAD") == 0;
 
     JS::SetReservedSlot(request, Slots::Method, JS::StringValue(method_str));
-    xqd_world_string_t method_xqd_str = { method.get(), method_len };
+    xqd_world_string_t method_xqd_str = {method.get(), method_len};
     if (!HANDLE_RESULT(cx, xqd_fastly_http_req_method_set(request_handle, &method_xqd_str))) {
       return nullptr;
     }
@@ -3170,8 +3170,8 @@ bool append_header_value(JSContext *cx, HandleObject self, HandleValue name, Han
       op = (AppendHeaderOperation *)xqd_fastly_http_req_header_append;
     else
       op = (AppendHeaderOperation *)xqd_fastly_http_resp_header_append;
-    xqd_world_string_t name = { name_chars.get(), name_len };
-    xqd_world_string_t val = { value_chars.get(), value_len };
+    xqd_world_string_t name = {name_chars.get(), name_len};
+    xqd_world_string_t val = {value_chars.get(), value_len};
     if (!HANDLE_RESULT(cx, op(handle(self), &name, &val))) {
       return false;
     }
@@ -3279,8 +3279,8 @@ bool set(JSContext *cx, unsigned argc, Value *vp) {
       op = (HeaderValueSetOperation *)xqd_fastly_http_req_header_insert;
     else
       op = (HeaderValueSetOperation *)xqd_fastly_http_resp_header_insert;
-    xqd_world_string_t name = { name_chars.get(), name_len };
-    xqd_world_string_t val = { value_chars.get(), value_len };
+    xqd_world_string_t name = {name_chars.get(), name_len};
+    xqd_world_string_t val = {value_chars.get(), value_len};
     if (!HANDLE_RESULT(cx, op(detail::handle(self), &name, &val))) {
       return false;
     }
@@ -3373,7 +3373,7 @@ bool delete_(JSContext *cx, unsigned argc, Value *vp) {
       op = (HeaderRemoveOperation *)xqd_fastly_http_req_header_remove;
     else
       op = (HeaderRemoveOperation *)xqd_fastly_http_resp_header_remove;
-    xqd_world_string_t name = { name_chars.get(), name_len };
+    xqd_world_string_t name = {name_chars.get(), name_len};
     if (!HANDLE_RESULT(cx, op(detail::handle(self), &name)))
       return false;
   }
@@ -3744,7 +3744,7 @@ static bool init_downstream_request(JSContext *cx, HandleObject request) {
     return false;
   }
 
-  SpecString spec(reinterpret_cast<uint8_t*>(uri_str.ptr), uri_str.len, uri_str.len);
+  SpecString spec(reinterpret_cast<uint8_t *>(uri_str.ptr), uri_str.len, uri_str.len);
   builtins::WorkerLocation::url = URL::create(cx, url_instance, spec);
   JS_free(cx, uri_str.ptr);
   if (!builtins::WorkerLocation::url) {
@@ -3893,7 +3893,8 @@ bool respondWithError(JSContext *cx, HandleObject self) {
   set_state(self, State::responsedWithError);
   fastly_response_handle_t response = INVALID_HANDLE;
   fastly_body_handle_t body;
-  return HANDLE_RESULT(cx, xqd_fastly_http_resp_new(&response)) && HANDLE_RESULT(cx, xqd_fastly_http_body_new(&body)) &&
+  return HANDLE_RESULT(cx, xqd_fastly_http_resp_new(&response)) &&
+         HANDLE_RESULT(cx, xqd_fastly_http_body_new(&body)) &&
          HANDLE_RESULT(cx, xqd_fastly_http_resp_status_set(response, 500)) &&
          HANDLE_RESULT(cx, xqd_fastly_http_resp_send_downstream(response, body, false));
 }
@@ -4568,7 +4569,7 @@ bool fetch(JSContext *cx, unsigned argc, Value *vp) {
       backend = builtins::Fastly::defaultBackend;
       if (!backend) {
         fastly_request_handle_t handle = Request::request_handle(request);
-        
+
         xqd_world_string_t uri_str;
         if (HANDLE_RESULT(cx, xqd_fastly_http_req_uri_get(handle, &uri_str))) {
           JS_ReportErrorUTF8(cx,
@@ -4602,18 +4603,18 @@ bool fetch(JSContext *cx, unsigned argc, Value *vp) {
     return false;
   }
 
-  xqd_world_string_t backend_str = { backend_chars.get(), backend_len };
+  xqd_world_string_t backend_str = {backend_chars.get(), backend_len};
 
   {
     FastlyStatus result;
     if (streaming) {
       result = convert_to_fastly_status(xqd_fastly_http_req_send_async_streaming(
-          Request::request_handle(request), RequestOrResponse::body_handle(request),
-          &backend_str, &request_handle));
+          Request::request_handle(request), RequestOrResponse::body_handle(request), &backend_str,
+          &request_handle));
     } else {
       result = convert_to_fastly_status(xqd_fastly_http_req_send_async(
-          Request::request_handle(request), RequestOrResponse::body_handle(request),
-          &backend_str, &request_handle));
+          Request::request_handle(request), RequestOrResponse::body_handle(request), &backend_str,
+          &request_handle));
     }
 
     if (!HANDLE_RESULT(cx, result))
@@ -4973,7 +4974,8 @@ bool process_pending_async_tasks(JSContext *cx) {
   }
 
   size_t count = pending_async_tasks->length();
-  auto handles = mozilla::MakeUnique<fastly_async_handle_t[]>(sizeof(fastly_async_handle_t) * count);
+  auto handles =
+      mozilla::MakeUnique<fastly_async_handle_t[]>(sizeof(fastly_async_handle_t) * count);
   if (!handles) {
     return false;
   }

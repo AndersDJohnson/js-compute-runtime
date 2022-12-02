@@ -91,9 +91,10 @@ bool Dictionary::constructor(JSContext *cx, unsigned argc, JS::Value *vp) {
     return false;
   }
 
-  auto is_valid_name = std::all_of(std::next(name_view.begin(), 1), name_view.end(), [&](auto character) {
-    return std::isalnum(character) || character == '_' || character == ' ';
-  });
+  auto is_valid_name =
+      std::all_of(std::next(name_view.begin(), 1), name_view.end(), [&](auto character) {
+        return std::isalnum(character) || character == '_' || character == ' ';
+      });
 
   if (!is_valid_name) {
     JS_ReportErrorNumberASCII(cx, GetErrorMessage, nullptr,

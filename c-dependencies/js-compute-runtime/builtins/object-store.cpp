@@ -184,7 +184,7 @@ bool get(JSContext *cx, unsigned argc, JS::Value *vp) {
   if (!key_chars)
     return false;
   key_str.ptr = key_chars.get();
-  
+
   if (!parse_and_validate_key(cx, &key_chars, key_str.len))
     return ReturnPromiseRejectedWithPendingError(cx, args);
 
@@ -228,7 +228,7 @@ bool put(JSContext *cx, unsigned argc, JS::Value *vp) {
   if (!key_chars)
     return false;
   key_str.ptr = key_chars.get();
-  
+
   if (!parse_and_validate_key(cx, &key_chars, key_str.len))
     return ReturnPromiseRejectedWithPendingError(cx, args);
 

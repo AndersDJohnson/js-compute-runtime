@@ -16,7 +16,8 @@ bool ConfigStore::get(JSContext *cx, unsigned argc, JS::Value *vp) {
   key_str.ptr = key.get();
 
   fastly_option_string_t ret;
-  auto status = convert_to_fastly_status(xqd_fastly_dictionary_get(ConfigStore::config_store_handle(self), &key_str, &ret));
+  auto status = convert_to_fastly_status(
+      xqd_fastly_dictionary_get(ConfigStore::config_store_handle(self), &key_str, &ret));
 
   // Ensure that we throw an exception for all unexpected host errors.
   if (!HANDLE_RESULT(cx, status))
@@ -53,8 +54,7 @@ bool ConfigStore::constructor(JSContext *cx, unsigned argc, JS::Value *vp) {
   if (!HANDLE_RESULT(cx, xqd_fastly_dictionary_open(&name_str, &dict_handle)))
     return false;
 
-  JS::SetReservedSlot(config_store, ConfigStore::Slots::Handle,
-                      JS::Int32Value(dict_handle));
+  JS::SetReservedSlot(config_store, ConfigStore::Slots::Handle, JS::Int32Value(dict_handle));
   if (!config_store)
     return false;
   args.rval().setObject(*config_store);

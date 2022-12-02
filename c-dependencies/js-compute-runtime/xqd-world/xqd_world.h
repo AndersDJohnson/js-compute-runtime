@@ -4,13 +4,13 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
 
 typedef struct {
-  char*ptr;
+  char *ptr;
   size_t len;
 } xqd_world_string_t;
 
@@ -185,13 +185,13 @@ typedef uint8_t fastly_backend_health_t;
 #define FASTLY_RESULT_BACKEND_HEALTH_OK 255
 // A handle to an object supporting generic async operations.
 // Can be either a `BodyHandle` or a `PendingRequestHandle`.
-// 
+//
 // Each async item has an associated I/O action:
-// 
+//
 // * Pending requests: awaiting the response headers / `Response` object
 // * Normal bodies: reading bytes from the body
 // * Streaming bodies: writing bytes to the body
-// 
+//
 // For writing bytes, note that there is a large host-side buffer that bytes can eagerly be written
 // into, even before the origin itself consumes that data.
 
@@ -484,321 +484,386 @@ typedef struct {
 
 // Imported Functions from `fastly`
 
-__attribute__((import_module("fastly"), import_name("abi-init")))
-void __wasm_import_fastly_abi_init(int64_t, int32_t);
+__attribute__((import_module("fastly"),
+               import_name("abi-init"))) void __wasm_import_fastly_abi_init(int64_t, int32_t);
 fastly_error_t fastly_abi_init(uint64_t abi_version);
 
-__attribute__((import_module("fastly"), import_name("uap-parse")))
-void __wasm_import_fastly_uap_parse(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("uap-parse"))) void
+    __wasm_import_fastly_uap_parse(int32_t, int32_t, int32_t);
 fastly_error_t fastly_uap_parse(xqd_world_string_t *user_agent, fastly_user_agent_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-body-new")))
-void __wasm_import_fastly_http_body_new(int32_t);
+__attribute__((import_module("fastly"),
+               import_name("http-body-new"))) void __wasm_import_fastly_http_body_new(int32_t);
 fastly_error_t fastly_http_body_new(fastly_body_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-body-append")))
-void __wasm_import_fastly_http_body_append(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-body-append"))) void
+    __wasm_import_fastly_http_body_append(int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_body_append(fastly_body_handle_t dest, fastly_body_handle_t src);
 
-__attribute__((import_module("fastly"), import_name("http-body-read")))
-void __wasm_import_fastly_http_body_read(int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_body_read(fastly_body_handle_t h, uint32_t chunk_size, fastly_list_u8_t *ret);
+__attribute__((import_module("fastly"), import_name("http-body-read"))) void
+    __wasm_import_fastly_http_body_read(int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_body_read(fastly_body_handle_t h, uint32_t chunk_size,
+                                     fastly_list_u8_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-body-write")))
-void __wasm_import_fastly_http_body_write(int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_body_write(fastly_body_handle_t h, fastly_list_u8_t *buf, fastly_body_write_end_t end, uint32_t *ret);
+__attribute__((import_module("fastly"), import_name("http-body-write"))) void
+    __wasm_import_fastly_http_body_write(int32_t, int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_body_write(fastly_body_handle_t h, fastly_list_u8_t *buf,
+                                      fastly_body_write_end_t end, uint32_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-body-close")))
-void __wasm_import_fastly_http_body_close(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-body-close"))) void
+    __wasm_import_fastly_http_body_close(int32_t, int32_t);
 fastly_error_t fastly_http_body_close(fastly_body_handle_t h);
 
-__attribute__((import_module("fastly"), import_name("log-endpoint-get")))
-void __wasm_import_fastly_log_endpoint_get(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("log-endpoint-get"))) void
+    __wasm_import_fastly_log_endpoint_get(int32_t, int32_t, int32_t);
 fastly_error_t fastly_log_endpoint_get(xqd_world_string_t *name, fastly_log_endpoint_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("log-write")))
-void __wasm_import_fastly_log_write(int32_t, int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("log-write"))) void
+    __wasm_import_fastly_log_write(int32_t, int32_t, int32_t, int32_t);
 fastly_error_t fastly_log_write(fastly_log_endpoint_handle_t h, xqd_world_string_t *msg);
 
-__attribute__((import_module("fastly"), import_name("http-req-body-downstream-get")))
-void __wasm_import_fastly_http_req_body_downstream_get(int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-body-downstream-get"))) void
+    __wasm_import_fastly_http_req_body_downstream_get(int32_t);
 fastly_error_t fastly_http_req_body_downstream_get(fastly_request_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-cache-override-set")))
-void __wasm_import_fastly_http_req_cache_override_set(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_cache_override_set(fastly_request_handle_t h, fastly_http_cache_override_tag_t tag, fastly_option_u32_t *ttl, fastly_option_u32_t *stale_while_revalidate, fastly_option_string_t *sk);
+__attribute__((import_module("fastly"), import_name("http-req-cache-override-set"))) void
+    __wasm_import_fastly_http_req_cache_override_set(int32_t, int32_t, int32_t, int32_t, int32_t,
+                                                     int32_t, int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_cache_override_set(fastly_request_handle_t h,
+                                                  fastly_http_cache_override_tag_t tag,
+                                                  fastly_option_u32_t *ttl,
+                                                  fastly_option_u32_t *stale_while_revalidate,
+                                                  fastly_option_string_t *sk);
 
-__attribute__((import_module("fastly"), import_name("http-req-downstream-client-ip-addr")))
-void __wasm_import_fastly_http_req_downstream_client_ip_addr(int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-downstream-client-ip-addr"))) void
+    __wasm_import_fastly_http_req_downstream_client_ip_addr(int32_t);
 fastly_error_t fastly_http_req_downstream_client_ip_addr(fastly_list_u8_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-downstream-client-h2-fingerprint")))
-void __wasm_import_fastly_http_req_downstream_client_h2_fingerprint(int32_t);
+__attribute__((import_module("fastly"),
+               import_name("http-req-downstream-client-h2-fingerprint"))) void
+    __wasm_import_fastly_http_req_downstream_client_h2_fingerprint(int32_t);
 fastly_error_t fastly_http_req_downstream_client_h2_fingerprint(fastly_list_u8_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-cipher-openssl-name")))
-void __wasm_import_fastly_http_req_downstream_tls_cipher_openssl_name(int32_t);
+__attribute__((import_module("fastly"),
+               import_name("http-req-downstream-tls-cipher-openssl-name"))) void
+    __wasm_import_fastly_http_req_downstream_tls_cipher_openssl_name(int32_t);
 fastly_error_t fastly_http_req_downstream_tls_cipher_openssl_name(xqd_world_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-protocol")))
-void __wasm_import_fastly_http_req_downstream_tls_protocol(int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-protocol"))) void
+    __wasm_import_fastly_http_req_downstream_tls_protocol(int32_t);
 fastly_error_t fastly_http_req_downstream_tls_protocol(xqd_world_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-client-hello")))
-void __wasm_import_fastly_http_req_downstream_tls_client_hello(int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-client-hello"))) void
+    __wasm_import_fastly_http_req_downstream_tls_client_hello(int32_t);
 fastly_error_t fastly_http_req_downstream_tls_client_hello(fastly_list_u8_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-client-certificate")))
-void __wasm_import_fastly_http_req_downstream_tls_client_certificate(int32_t);
+__attribute__((import_module("fastly"),
+               import_name("http-req-downstream-tls-client-certificate"))) void
+    __wasm_import_fastly_http_req_downstream_tls_client_certificate(int32_t);
 fastly_error_t fastly_http_req_downstream_tls_client_certificate(fastly_list_u8_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-client-cert-verify-result")))
-void __wasm_import_fastly_http_req_downstream_tls_client_cert_verify_result(int32_t);
+__attribute__((import_module("fastly"),
+               import_name("http-req-downstream-tls-client-cert-verify-result"))) void
+    __wasm_import_fastly_http_req_downstream_tls_client_cert_verify_result(int32_t);
 fastly_error_t fastly_http_req_downstream_tls_client_cert_verify_result(void);
 
-__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-ja3-md5")))
-void __wasm_import_fastly_http_req_downstream_tls_ja3_md5(int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-downstream-tls-ja3-md5"))) void
+    __wasm_import_fastly_http_req_downstream_tls_ja3_md5(int32_t);
 fastly_error_t fastly_http_req_downstream_tls_ja3_md5(fastly_list_u8_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-new")))
-void __wasm_import_fastly_http_req_new(int32_t);
+__attribute__((import_module("fastly"),
+               import_name("http-req-new"))) void __wasm_import_fastly_http_req_new(int32_t);
 fastly_error_t fastly_http_req_new(fastly_request_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-header-names-get")))
-void __wasm_import_fastly_http_req_header_names_get(int32_t, int32_t);
-fastly_error_t fastly_http_req_header_names_get(fastly_request_handle_t h, fastly_list_string_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-header-names-get"))) void
+    __wasm_import_fastly_http_req_header_names_get(int32_t, int32_t);
+fastly_error_t fastly_http_req_header_names_get(fastly_request_handle_t h,
+                                                fastly_list_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-header-value-get")))
-void __wasm_import_fastly_http_req_header_value_get(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_header_value_get(fastly_request_handle_t h, xqd_world_string_t *name, fastly_option_string_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-header-value-get"))) void
+    __wasm_import_fastly_http_req_header_value_get(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_header_value_get(fastly_request_handle_t h, xqd_world_string_t *name,
+                                                fastly_option_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-header-values-get")))
-void __wasm_import_fastly_http_req_header_values_get(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_header_values_get(fastly_request_handle_t h, xqd_world_string_t *name, fastly_option_list_string_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-header-values-get"))) void
+    __wasm_import_fastly_http_req_header_values_get(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_header_values_get(fastly_request_handle_t h,
+                                                 xqd_world_string_t *name,
+                                                 fastly_option_list_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-header-values-set")))
-void __wasm_import_fastly_http_req_header_values_set(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_header_values_set(fastly_request_handle_t h, xqd_world_string_t *name, fastly_list_string_t *values);
+__attribute__((import_module("fastly"), import_name("http-req-header-values-set"))) void
+    __wasm_import_fastly_http_req_header_values_set(int32_t, int32_t, int32_t, int32_t, int32_t,
+                                                    int32_t);
+fastly_error_t fastly_http_req_header_values_set(fastly_request_handle_t h,
+                                                 xqd_world_string_t *name,
+                                                 fastly_list_string_t *values);
 
-__attribute__((import_module("fastly"), import_name("http-req-header-insert")))
-void __wasm_import_fastly_http_req_header_insert(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_header_insert(fastly_request_handle_t h, xqd_world_string_t *name, xqd_world_string_t *value);
+__attribute__((import_module("fastly"), import_name("http-req-header-insert"))) void
+    __wasm_import_fastly_http_req_header_insert(int32_t, int32_t, int32_t, int32_t, int32_t,
+                                                int32_t);
+fastly_error_t fastly_http_req_header_insert(fastly_request_handle_t h, xqd_world_string_t *name,
+                                             xqd_world_string_t *value);
 
-__attribute__((import_module("fastly"), import_name("http-req-header-append")))
-void __wasm_import_fastly_http_req_header_append(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_header_append(fastly_request_handle_t h, xqd_world_string_t *name, xqd_world_string_t *value);
+__attribute__((import_module("fastly"), import_name("http-req-header-append"))) void
+    __wasm_import_fastly_http_req_header_append(int32_t, int32_t, int32_t, int32_t, int32_t,
+                                                int32_t);
+fastly_error_t fastly_http_req_header_append(fastly_request_handle_t h, xqd_world_string_t *name,
+                                             xqd_world_string_t *value);
 
-__attribute__((import_module("fastly"), import_name("http-req-header-remove")))
-void __wasm_import_fastly_http_req_header_remove(int32_t, int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-header-remove"))) void
+    __wasm_import_fastly_http_req_header_remove(int32_t, int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_req_header_remove(fastly_request_handle_t h, xqd_world_string_t *name);
 
-__attribute__((import_module("fastly"), import_name("http-req-method-get")))
-void __wasm_import_fastly_http_req_method_get(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-method-get"))) void
+    __wasm_import_fastly_http_req_method_get(int32_t, int32_t);
 fastly_error_t fastly_http_req_method_get(fastly_request_handle_t h, xqd_world_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-method-set")))
-void __wasm_import_fastly_http_req_method_set(int32_t, int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-method-set"))) void
+    __wasm_import_fastly_http_req_method_set(int32_t, int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_req_method_set(fastly_request_handle_t h, xqd_world_string_t *method);
 
-__attribute__((import_module("fastly"), import_name("http-req-uri-get")))
-void __wasm_import_fastly_http_req_uri_get(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-uri-get"))) void
+    __wasm_import_fastly_http_req_uri_get(int32_t, int32_t);
 fastly_error_t fastly_http_req_uri_get(fastly_request_handle_t h, xqd_world_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-uri-set")))
-void __wasm_import_fastly_http_req_uri_set(int32_t, int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-uri-set"))) void
+    __wasm_import_fastly_http_req_uri_set(int32_t, int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_req_uri_set(fastly_request_handle_t h, xqd_world_string_t *uri);
 
-__attribute__((import_module("fastly"), import_name("http-req-version-get")))
-void __wasm_import_fastly_http_req_version_get(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-version-get"))) void
+    __wasm_import_fastly_http_req_version_get(int32_t, int32_t);
 fastly_error_t fastly_http_req_version_get(fastly_request_handle_t h, fastly_http_version_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-version-set")))
-void __wasm_import_fastly_http_req_version_set(int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_version_set(fastly_request_handle_t h, fastly_http_version_t version);
+__attribute__((import_module("fastly"), import_name("http-req-version-set"))) void
+    __wasm_import_fastly_http_req_version_set(int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_version_set(fastly_request_handle_t h,
+                                           fastly_http_version_t version);
 
-__attribute__((import_module("fastly"), import_name("http-req-send")))
-void __wasm_import_fastly_http_req_send(int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_send(fastly_request_handle_t h, fastly_body_handle_t b, xqd_world_string_t *backend, fastly_response_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-send"))) void
+    __wasm_import_fastly_http_req_send(int32_t, int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_send(fastly_request_handle_t h, fastly_body_handle_t b,
+                                    xqd_world_string_t *backend, fastly_response_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-send-async")))
-void __wasm_import_fastly_http_req_send_async(int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_send_async(fastly_request_handle_t h, fastly_body_handle_t b, xqd_world_string_t *backend, fastly_pending_request_handle_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-send-async"))) void
+    __wasm_import_fastly_http_req_send_async(int32_t, int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_send_async(fastly_request_handle_t h, fastly_body_handle_t b,
+                                          xqd_world_string_t *backend,
+                                          fastly_pending_request_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-send-async-streaming")))
-void __wasm_import_fastly_http_req_send_async_streaming(int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_send_async_streaming(fastly_request_handle_t h, fastly_body_handle_t b, xqd_world_string_t *backend, fastly_pending_request_handle_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-send-async-streaming"))) void
+    __wasm_import_fastly_http_req_send_async_streaming(int32_t, int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_send_async_streaming(fastly_request_handle_t h,
+                                                    fastly_body_handle_t b,
+                                                    xqd_world_string_t *backend,
+                                                    fastly_pending_request_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-pending-req-poll")))
-void __wasm_import_fastly_http_req_pending_req_poll(int32_t, int32_t);
-fastly_error_t fastly_http_req_pending_req_poll(fastly_pending_request_handle_t h, fastly_option_response_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-pending-req-poll"))) void
+    __wasm_import_fastly_http_req_pending_req_poll(int32_t, int32_t);
+fastly_error_t fastly_http_req_pending_req_poll(fastly_pending_request_handle_t h,
+                                                fastly_option_response_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-pending-req-wait")))
-void __wasm_import_fastly_http_req_pending_req_wait(int32_t, int32_t);
-fastly_error_t fastly_http_req_pending_req_wait(fastly_pending_request_handle_t h, fastly_response_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-pending-req-wait"))) void
+    __wasm_import_fastly_http_req_pending_req_wait(int32_t, int32_t);
+fastly_error_t fastly_http_req_pending_req_wait(fastly_pending_request_handle_t h,
+                                                fastly_response_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-pending-req-select")))
-void __wasm_import_fastly_http_req_pending_req_select(int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_pending_req_select(fastly_list_pending_request_handle_t *h, fastly_tuple2_u32_response_t *ret);
+__attribute__((import_module("fastly"), import_name("http-req-pending-req-select"))) void
+    __wasm_import_fastly_http_req_pending_req_select(int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_pending_req_select(fastly_list_pending_request_handle_t *h,
+                                                  fastly_tuple2_u32_response_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-key-is-valid")))
-void __wasm_import_fastly_http_req_key_is_valid(int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-key-is-valid"))) void
+    __wasm_import_fastly_http_req_key_is_valid(int32_t);
 fastly_error_t fastly_http_req_key_is_valid(bool *ret);
 
-__attribute__((import_module("fastly"), import_name("http-req-close")))
-void __wasm_import_fastly_http_req_close(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-close"))) void
+    __wasm_import_fastly_http_req_close(int32_t, int32_t);
 fastly_error_t fastly_http_req_close(fastly_request_handle_t h);
 
-__attribute__((import_module("fastly"), import_name("http-req-auto-decompress-response-set")))
-void __wasm_import_fastly_http_req_auto_decompress_response_set(int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_auto_decompress_response_set(fastly_request_handle_t h, fastly_content_encodings_t encodings);
+__attribute__((import_module("fastly"), import_name("http-req-auto-decompress-response-set"))) void
+    __wasm_import_fastly_http_req_auto_decompress_response_set(int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_auto_decompress_response_set(fastly_request_handle_t h,
+                                                            fastly_content_encodings_t encodings);
 
-__attribute__((import_module("fastly"), import_name("http-req-upgrade-websocket")))
-void __wasm_import_fastly_http_req_upgrade_websocket(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-upgrade-websocket"))) void
+    __wasm_import_fastly_http_req_upgrade_websocket(int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_req_upgrade_websocket(xqd_world_string_t *backend);
 
-__attribute__((import_module("fastly"), import_name("http-req-redirect-to-websocket-proxy")))
-void __wasm_import_fastly_http_req_redirect_to_websocket_proxy(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-redirect-to-websocket-proxy"))) void
+    __wasm_import_fastly_http_req_redirect_to_websocket_proxy(int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_req_redirect_to_websocket_proxy(xqd_world_string_t *backend);
 
-__attribute__((import_module("fastly"), import_name("http-req-redirect-to-grip-proxy")))
-void __wasm_import_fastly_http_req_redirect_to_grip_proxy(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-req-redirect-to-grip-proxy"))) void
+    __wasm_import_fastly_http_req_redirect_to_grip_proxy(int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_req_redirect_to_grip_proxy(xqd_world_string_t *backend);
 
-__attribute__((import_module("fastly"), import_name("http-req-framing-headers-mode-set")))
-void __wasm_import_fastly_http_req_framing_headers_mode_set(int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_req_framing_headers_mode_set(fastly_request_handle_t h, fastly_framing_headers_mode_t mode);
+__attribute__((import_module("fastly"), import_name("http-req-framing-headers-mode-set"))) void
+    __wasm_import_fastly_http_req_framing_headers_mode_set(int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_req_framing_headers_mode_set(fastly_request_handle_t h,
+                                                        fastly_framing_headers_mode_t mode);
 
-__attribute__((import_module("fastly"), import_name("http-req-register-dynamic-backend")))
-void __wasm_import_fastly_http_req_register_dynamic_backend(int32_t, int32_t);
-fastly_error_t fastly_http_req_register_dynamic_backend(xqd_world_string_t *prefix, xqd_world_string_t *target, fastly_dynamic_backend_config_t *config);
+__attribute__((import_module("fastly"), import_name("http-req-register-dynamic-backend"))) void
+    __wasm_import_fastly_http_req_register_dynamic_backend(int32_t, int32_t);
+fastly_error_t fastly_http_req_register_dynamic_backend(xqd_world_string_t *prefix,
+                                                        xqd_world_string_t *target,
+                                                        fastly_dynamic_backend_config_t *config);
 
-__attribute__((import_module("fastly"), import_name("http-resp-new")))
-void __wasm_import_fastly_http_resp_new(int32_t);
+__attribute__((import_module("fastly"),
+               import_name("http-resp-new"))) void __wasm_import_fastly_http_resp_new(int32_t);
 fastly_error_t fastly_http_resp_new(fastly_response_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-resp-header-names-get")))
-void __wasm_import_fastly_http_resp_header_names_get(int32_t, int32_t);
-fastly_error_t fastly_http_resp_header_names_get(fastly_response_handle_t h, fastly_list_string_t *ret);
+__attribute__((import_module("fastly"), import_name("http-resp-header-names-get"))) void
+    __wasm_import_fastly_http_resp_header_names_get(int32_t, int32_t);
+fastly_error_t fastly_http_resp_header_names_get(fastly_response_handle_t h,
+                                                 fastly_list_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-resp-header-value-get")))
-void __wasm_import_fastly_http_resp_header_value_get(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_resp_header_value_get(fastly_response_handle_t h, xqd_world_string_t *name, fastly_option_string_t *ret);
+__attribute__((import_module("fastly"), import_name("http-resp-header-value-get"))) void
+    __wasm_import_fastly_http_resp_header_value_get(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_resp_header_value_get(fastly_response_handle_t h,
+                                                 xqd_world_string_t *name,
+                                                 fastly_option_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-resp-header-values-get")))
-void __wasm_import_fastly_http_resp_header_values_get(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_resp_header_values_get(fastly_response_handle_t h, xqd_world_string_t *name, fastly_option_list_string_t *ret);
+__attribute__((import_module("fastly"), import_name("http-resp-header-values-get"))) void
+    __wasm_import_fastly_http_resp_header_values_get(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_resp_header_values_get(fastly_response_handle_t h,
+                                                  xqd_world_string_t *name,
+                                                  fastly_option_list_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-resp-header-values-set")))
-void __wasm_import_fastly_http_resp_header_values_set(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_resp_header_values_set(fastly_response_handle_t h, xqd_world_string_t *name, fastly_list_string_t *values);
+__attribute__((import_module("fastly"), import_name("http-resp-header-values-set"))) void
+    __wasm_import_fastly_http_resp_header_values_set(int32_t, int32_t, int32_t, int32_t, int32_t,
+                                                     int32_t);
+fastly_error_t fastly_http_resp_header_values_set(fastly_response_handle_t h,
+                                                  xqd_world_string_t *name,
+                                                  fastly_list_string_t *values);
 
-__attribute__((import_module("fastly"), import_name("http-resp-header-insert")))
-void __wasm_import_fastly_http_resp_header_insert(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_resp_header_insert(fastly_response_handle_t h, xqd_world_string_t *name, xqd_world_string_t *value);
+__attribute__((import_module("fastly"), import_name("http-resp-header-insert"))) void
+    __wasm_import_fastly_http_resp_header_insert(int32_t, int32_t, int32_t, int32_t, int32_t,
+                                                 int32_t);
+fastly_error_t fastly_http_resp_header_insert(fastly_response_handle_t h, xqd_world_string_t *name,
+                                              xqd_world_string_t *value);
 
-__attribute__((import_module("fastly"), import_name("http-resp-header-append")))
-void __wasm_import_fastly_http_resp_header_append(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_resp_header_append(fastly_response_handle_t h, xqd_world_string_t *name, xqd_world_string_t *value);
+__attribute__((import_module("fastly"), import_name("http-resp-header-append"))) void
+    __wasm_import_fastly_http_resp_header_append(int32_t, int32_t, int32_t, int32_t, int32_t,
+                                                 int32_t);
+fastly_error_t fastly_http_resp_header_append(fastly_response_handle_t h, xqd_world_string_t *name,
+                                              xqd_world_string_t *value);
 
-__attribute__((import_module("fastly"), import_name("http-resp-header-remove")))
-void __wasm_import_fastly_http_resp_header_remove(int32_t, int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-resp-header-remove"))) void
+    __wasm_import_fastly_http_resp_header_remove(int32_t, int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_resp_header_remove(fastly_response_handle_t h, xqd_world_string_t *name);
 
-__attribute__((import_module("fastly"), import_name("http-resp-version-get")))
-void __wasm_import_fastly_http_resp_version_get(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-resp-version-get"))) void
+    __wasm_import_fastly_http_resp_version_get(int32_t, int32_t);
 fastly_error_t fastly_http_resp_version_get(fastly_response_handle_t h, fastly_http_version_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-resp-version-set")))
-void __wasm_import_fastly_http_resp_version_set(int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_resp_version_set(fastly_response_handle_t h, fastly_http_version_t version);
+__attribute__((import_module("fastly"), import_name("http-resp-version-set"))) void
+    __wasm_import_fastly_http_resp_version_set(int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_resp_version_set(fastly_response_handle_t h,
+                                            fastly_http_version_t version);
 
-__attribute__((import_module("fastly"), import_name("http-resp-send-downstream")))
-void __wasm_import_fastly_http_resp_send_downstream(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_resp_send_downstream(fastly_response_handle_t h, fastly_body_handle_t b, bool streaming);
+__attribute__((import_module("fastly"), import_name("http-resp-send-downstream"))) void
+    __wasm_import_fastly_http_resp_send_downstream(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_resp_send_downstream(fastly_response_handle_t h, fastly_body_handle_t b,
+                                                bool streaming);
 
-__attribute__((import_module("fastly"), import_name("http-resp-status-get")))
-void __wasm_import_fastly_http_resp_status_get(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-resp-status-get"))) void
+    __wasm_import_fastly_http_resp_status_get(int32_t, int32_t);
 fastly_error_t fastly_http_resp_status_get(fastly_response_handle_t h, fastly_http_status_t *ret);
 
-__attribute__((import_module("fastly"), import_name("http-resp-status-set")))
-void __wasm_import_fastly_http_resp_status_set(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-resp-status-set"))) void
+    __wasm_import_fastly_http_resp_status_set(int32_t, int32_t, int32_t);
 fastly_error_t fastly_http_resp_status_set(fastly_response_handle_t h, fastly_http_status_t status);
 
-__attribute__((import_module("fastly"), import_name("http-resp-close")))
-void __wasm_import_fastly_http_resp_close(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("http-resp-close"))) void
+    __wasm_import_fastly_http_resp_close(int32_t, int32_t);
 fastly_error_t fastly_http_resp_close(fastly_response_handle_t h);
 
-__attribute__((import_module("fastly"), import_name("http-resp-framing-headers-mode-set")))
-void __wasm_import_fastly_http_resp_framing_headers_mode_set(int32_t, int32_t, int32_t);
-fastly_error_t fastly_http_resp_framing_headers_mode_set(fastly_response_handle_t h, fastly_framing_headers_mode_t mode);
+__attribute__((import_module("fastly"), import_name("http-resp-framing-headers-mode-set"))) void
+    __wasm_import_fastly_http_resp_framing_headers_mode_set(int32_t, int32_t, int32_t);
+fastly_error_t fastly_http_resp_framing_headers_mode_set(fastly_response_handle_t h,
+                                                         fastly_framing_headers_mode_t mode);
 
-__attribute__((import_module("fastly"), import_name("dictionary-open")))
-void __wasm_import_fastly_dictionary_open(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("dictionary-open"))) void
+    __wasm_import_fastly_dictionary_open(int32_t, int32_t, int32_t);
 fastly_error_t fastly_dictionary_open(xqd_world_string_t *name, fastly_dictionary_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("dictionary-get")))
-void __wasm_import_fastly_dictionary_get(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_dictionary_get(fastly_dictionary_handle_t h, xqd_world_string_t *key, fastly_option_string_t *ret);
+__attribute__((import_module("fastly"), import_name("dictionary-get"))) void
+    __wasm_import_fastly_dictionary_get(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_dictionary_get(fastly_dictionary_handle_t h, xqd_world_string_t *key,
+                                     fastly_option_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("geo-lookup")))
-void __wasm_import_fastly_geo_lookup(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("geo-lookup"))) void
+    __wasm_import_fastly_geo_lookup(int32_t, int32_t, int32_t);
 fastly_error_t fastly_geo_lookup(fastly_list_u8_t *addr_octets, xqd_world_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("kv-open")))
-void __wasm_import_fastly_kv_open(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("kv-open"))) void
+    __wasm_import_fastly_kv_open(int32_t, int32_t, int32_t);
 fastly_error_t fastly_kv_open(xqd_world_string_t *name, fastly_kv_store_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("kv-lookup")))
-void __wasm_import_fastly_kv_lookup(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_kv_lookup(fastly_kv_store_handle_t store, fastly_list_u8_t *key, fastly_option_body_handle_t *ret);
+__attribute__((import_module("fastly"), import_name("kv-lookup"))) void
+    __wasm_import_fastly_kv_lookup(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_kv_lookup(fastly_kv_store_handle_t store, fastly_list_u8_t *key,
+                                fastly_option_body_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("kv-insert")))
-void __wasm_import_fastly_kv_insert(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_kv_insert(fastly_kv_store_handle_t store, fastly_list_u8_t *key, fastly_body_handle_t body_handle, uint32_t max_age, bool *ret);
+__attribute__((import_module("fastly"), import_name("kv-insert"))) void
+    __wasm_import_fastly_kv_insert(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_kv_insert(fastly_kv_store_handle_t store, fastly_list_u8_t *key,
+                                fastly_body_handle_t body_handle, uint32_t max_age, bool *ret);
 
-__attribute__((import_module("fastly"), import_name("object-store-open")))
-void __wasm_import_fastly_object_store_open(int32_t, int32_t, int32_t);
-fastly_error_t fastly_object_store_open(xqd_world_string_t *name, fastly_object_store_handle_t *ret);
+__attribute__((import_module("fastly"), import_name("object-store-open"))) void
+    __wasm_import_fastly_object_store_open(int32_t, int32_t, int32_t);
+fastly_error_t fastly_object_store_open(xqd_world_string_t *name,
+                                        fastly_object_store_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("object-store-lookup")))
-void __wasm_import_fastly_object_store_lookup(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_object_store_lookup(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_option_body_handle_t *ret);
+__attribute__((import_module("fastly"), import_name("object-store-lookup"))) void
+    __wasm_import_fastly_object_store_lookup(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_object_store_lookup(fastly_object_store_handle_t store,
+                                          xqd_world_string_t *key,
+                                          fastly_option_body_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("object-store-lookup-as-fd")))
-void __wasm_import_fastly_object_store_lookup_as_fd(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_option_fd_t *ret);
+__attribute__((import_module("fastly"), import_name("object-store-lookup-as-fd"))) void
+    __wasm_import_fastly_object_store_lookup_as_fd(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_object_store_lookup_as_fd(fastly_object_store_handle_t store,
+                                                xqd_world_string_t *key, fastly_option_fd_t *ret);
 
-__attribute__((import_module("fastly"), import_name("object-store-insert")))
-void __wasm_import_fastly_object_store_insert(int32_t, int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store, xqd_world_string_t *key, fastly_body_handle_t body_handle);
+__attribute__((import_module("fastly"), import_name("object-store-insert"))) void
+    __wasm_import_fastly_object_store_insert(int32_t, int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_object_store_insert(fastly_object_store_handle_t store,
+                                          xqd_world_string_t *key,
+                                          fastly_body_handle_t body_handle);
 
-__attribute__((import_module("fastly"), import_name("secret-store-open")))
-void __wasm_import_fastly_secret_store_open(int32_t, int32_t, int32_t);
-fastly_error_t fastly_secret_store_open(xqd_world_string_t *name, fastly_secret_store_handle_t *ret);
+__attribute__((import_module("fastly"), import_name("secret-store-open"))) void
+    __wasm_import_fastly_secret_store_open(int32_t, int32_t, int32_t);
+fastly_error_t fastly_secret_store_open(xqd_world_string_t *name,
+                                        fastly_secret_store_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("secret-store-get")))
-void __wasm_import_fastly_secret_store_get(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_secret_store_get(fastly_secret_store_handle_t store, xqd_world_string_t *key, fastly_option_secret_handle_t *ret);
+__attribute__((import_module("fastly"), import_name("secret-store-get"))) void
+    __wasm_import_fastly_secret_store_get(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_secret_store_get(fastly_secret_store_handle_t store, xqd_world_string_t *key,
+                                       fastly_option_secret_handle_t *ret);
 
-__attribute__((import_module("fastly"), import_name("secret-store-plaintext")))
-void __wasm_import_fastly_secret_store_plaintext(int32_t, int32_t);
-fastly_error_t fastly_secret_store_plaintext(fastly_secret_handle_t secret, fastly_option_string_t *ret);
+__attribute__((import_module("fastly"), import_name("secret-store-plaintext"))) void
+    __wasm_import_fastly_secret_store_plaintext(int32_t, int32_t);
+fastly_error_t fastly_secret_store_plaintext(fastly_secret_handle_t secret,
+                                             fastly_option_string_t *ret);
 
-__attribute__((import_module("fastly"), import_name("backend-is-healthy")))
-void __wasm_import_fastly_backend_is_healthy(int32_t, int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("backend-is-healthy"))) void
+    __wasm_import_fastly_backend_is_healthy(int32_t, int32_t, int32_t);
 fastly_error_t fastly_backend_is_healthy(xqd_world_string_t *backend, fastly_backend_health_t *ret);
 
-__attribute__((import_module("fastly"), import_name("async-io-select")))
-void __wasm_import_fastly_async_io_select(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_async_io_select(fastly_list_async_handle_t *hs, uint32_t timeout_ms, uint32_t *ret);
+__attribute__((import_module("fastly"), import_name("async-io-select"))) void
+    __wasm_import_fastly_async_io_select(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_async_io_select(fastly_list_async_handle_t *hs, uint32_t timeout_ms,
+                                      uint32_t *ret);
 
-__attribute__((import_module("fastly"), import_name("async-io-is-ready")))
-void __wasm_import_fastly_async_io_is_ready(int32_t, int32_t);
+__attribute__((import_module("fastly"), import_name("async-io-is-ready"))) void
+    __wasm_import_fastly_async_io_is_ready(int32_t, int32_t);
 fastly_error_t fastly_async_io_is_ready(fastly_async_handle_t handle, bool *ret);
 
-__attribute__((import_module("fastly"), import_name("purge-surrogate-key")))
-void __wasm_import_fastly_purge_surrogate_key(int32_t, int32_t, int32_t, int32_t);
-fastly_error_t fastly_purge_surrogate_key(xqd_world_string_t *surrogate_key, bool soft_purge, fastly_purge_result_t *ret);
+__attribute__((import_module("fastly"), import_name("purge-surrogate-key"))) void
+    __wasm_import_fastly_purge_surrogate_key(int32_t, int32_t, int32_t, int32_t);
+fastly_error_t fastly_purge_surrogate_key(xqd_world_string_t *surrogate_key, bool soft_purge,
+                                          fastly_purge_result_t *ret);
 
 #ifdef __cplusplus
 }
