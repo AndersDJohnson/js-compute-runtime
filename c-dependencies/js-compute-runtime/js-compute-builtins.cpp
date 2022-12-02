@@ -3689,7 +3689,7 @@ static JSObject *prepare_downstream_request(JSContext *cx) {
  * Fully initialize the Request object based on the incoming request.
  */
 static bool init_downstream_request(JSContext *cx, HandleObject request) {
-  MOZ_ASSERT(Request::request_handle(request).handle == INVALID_HANDLE);
+  MOZ_ASSERT(Request::request_handle(request) == INVALID_HANDLE);
 
   fastly_request_t req;
   if (!HANDLE_RESULT(cx, xqd_fastly_http_req_body_downstream_get(&req)))
