@@ -4119,8 +4119,6 @@ JS::Result<std::string> ConvertJSValueToByteString(JSContext *cx, JS::Handle<JS:
     // Creating an exception can GC, so we first scan the string for bad chars
     // and report the error outside the AutoCheckCannotGC scope.
     bool foundBadChar = false;
-    size_t badCharIndex;
-    char16_t badChar;
     {
       JS::AutoCheckCannotGC nogc;
       const char16_t *chars = JS_GetTwoByteStringCharsAndLength(cx, nogc, s, &length);
@@ -4131,8 +4129,6 @@ JS::Result<std::string> ConvertJSValueToByteString(JSContext *cx, JS::Handle<JS:
 
       for (size_t i = 0; i < length; i++) {
         if (chars[i] > 255) {
-          badCharIndex = i;
-          badChar = chars[i];
           foundBadChar = true;
           break;
         }
